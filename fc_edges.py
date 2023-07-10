@@ -57,13 +57,13 @@ with open('fc_dict_last_60_TR.pickle', 'rb') as f:
 
 # only keep the edges if they are in the edges rest
 edges_rest_awake_post_hoc = edges_rest_awake_last_60_TR[[col for col in edges_rest_awake_last_60_TR.columns if col in edges_rest]]
-print(edges_rest_awake_post_hoc.shape)
+# print(edges_rest_awake_post_hoc.shape)
 edges_rest_mild_post_hoc = edges_rest_mild_last_60_TR[[col for col in edges_rest_mild_last_60_TR.columns if col in edges_rest]]
-print(edges_rest_mild_post_hoc.shape)
+# print(edges_rest_mild_post_hoc.shape)
 edges_rest_deep_post_hoc = edges_rest_deep_last_60_TR[[col for col in edges_rest_deep_last_60_TR.columns if col in edges_rest]]
-print(edges_rest_deep_post_hoc.shape)
+# print(edges_rest_deep_post_hoc.shape)
 edges_rest_recovery_post_hoc = edges_rest_recovery_last_60_TR[[col for col in edges_rest_recovery_last_60_TR.columns if col in edges_rest]]
-print(edges_rest_recovery_post_hoc.shape)
+# print(edges_rest_recovery_post_hoc.shape)
 
 
 

@@ -221,7 +221,7 @@ df_movie = df_movie.dropna(axis=1)
 # print(df_movie.shape)
 
 df_combined = df_combined.dropna(axis=1)
-print(df_combined.shape)
+# print(df_combined.shape)
 
 df_03 = df_03.dropna(axis=1)
 # print(df_03.shape)
@@ -352,7 +352,7 @@ df_03_30 = df_03_30.dropna(axis=1)
 # movie_clean.to_csv('pls_movie_clean.csv', index=False, header=False)
 # rest_clean.to_csv('pls_rest_clean.csv', index=False, header=False)
 
-
+print('Partial_Least_Squares has been read')
 
 
 
