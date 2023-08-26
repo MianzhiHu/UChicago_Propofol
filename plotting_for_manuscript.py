@@ -2,18 +2,148 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from scipy.stats import gaussian_kde
+from PIL import Image
+
+
+def side_by_side_plot_generator(img1, img2, figure_length, figure_width, title1, title2, title, orientation, loc1=None,
+                                loc2=None, dpi=None):
+    if orientation == 'horizontal':
+        fig, ax = plt.subplots(1, 2, figsize=(figure_length, figure_width), constrained_layout=True, dpi=dpi)
+        ax[0].set_position([0, 0, 0.5, 1])
+        ax[1].set_position([0.5, 0, 0.5, 1])
+    if orientation == 'vertical':
+        fig, ax = plt.subplots(2, 1, figsize=(figure_length, figure_width), constrained_layout=True, dpi=dpi)
+        ax[0].set_position([0, 0.5, 1, 0.5])
+        ax[1].set_position([0, 0, 1, 0.5])
+    # remove the borders
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax[0].spines[axis].set_linewidth(0)
+        ax[1].spines[axis].set_linewidth(0)
+    ax[0].imshow(img1)
+    ax[0].set_title(title1, loc=loc1)
+    # remove the x and y ticks
+    ax[0].set_xticks([])
+    ax[0].set_yticks([])
+    ax[1].imshow(img2)
+    ax[1].set_title(title2, loc=loc2)
+    # remove the x and y ticks
+    ax[1].set_xticks([])
+    ax[1].set_yticks([])
+    for i in range(2):
+        ax[i].title.set_fontsize(8)
+    # save the figure
+    plt_name = title + '.png'
+    plt_dir = './graphs/'
+    plt_path = plt_dir + plt_name
+    plt.savefig(plt_path)
+    plt.show()
+
+
+side_by_side_plot_generator(img1=plt.imread('./graphs/brain loadings - fc.png'),
+                            img2=plt.imread('./graphs/brain loadings - fc_left.png'),
+                            figure_length=5,
+                            figure_width=3,
+                            title1='Right Hemisphere',
+                            title2='Left Hemisphere',
+                            title='FC_Movie_brain',
+                            orientation='horizontal',
+                            dpi=650)
+
+side_by_side_plot_generator(img1=plt.imread('./graphs/edges_movie_abs.png'),
+                            img2=plt.imread('./graphs/edges_movie_plot.png'),
+                            figure_length=3,
+                            figure_width=5,
+                            title1='(a) Combined Effects PLS - Edges',
+                            title2='(b) Significant Edges in PLS - Edges',
+                            title='Combined Effects - Edges',
+                            orientation='vertical',
+                            dpi=600)
+
+side_by_side_plot_generator(img1=plt.imread('./graphs/PLS_neurosynth_hurst.png'),
+                            img2=plt.imread('./graphs/Neurosynth_2_terms.png'),
+                            figure_length=5,
+                            figure_width=3,
+                            title1='(a) Combined Effects - Neurosynth',
+                            title2='(b) Neurosynth Templates',
+                            title='Combined Effects - Neurosynth',
+                            orientation='horizontal',
+                            dpi=600)
+
+
+def four_consecutive_plot_generator(img1, img2, img3, img4, figure_length, figure_width,
+                                    title1, title2, title3, title4, title, orientation,
+                                    loc=None, dpi=None):
+    if orientation == 'horizontal':
+        fig, ax = plt.subplots(1, 4, figsize=(figure_length, figure_width), constrained_layout=True, dpi=dpi)
+        ax[0].set_position([0, 0, 0.25, 1])
+        ax[1].set_position([0.25, 0, 0.25, 1])
+        ax[2].set_position([0.5, 0, 0.25, 1])
+        ax[3].set_position([0.75, 0, 0.25, 1])
+    if orientation == 'vertical':
+        fig, ax = plt.subplots(4, 1, figsize=(figure_length, figure_width), constrained_layout=True, dpi=dpi)
+        ax[0].set_position([0, 0.72, 1, 0.24])
+        ax[1].set_position([0, 0.48, 1, 0.24])
+        ax[2].set_position([0, 0.24, 1, 0.24])
+        ax[3].set_position([0, 0, 1, 0.24])
+    # remove the borders
+    for axis in ['top', 'bottom', 'left', 'right']:
+        ax[0].spines[axis].set_linewidth(0)
+        ax[1].spines[axis].set_linewidth(0)
+        ax[2].spines[axis].set_linewidth(0)
+        ax[3].spines[axis].set_linewidth(0)
+    ax[0].imshow(img1)
+    ax[0].set_title(title1, loc=loc)
+    ax[1].imshow(img2)
+    ax[1].set_title(title2, loc=loc)
+    ax[2].imshow(img3)
+    ax[2].set_title(title3, loc=loc)
+    ax[3].imshow(img4)
+    ax[3].set_title(title4, loc=loc)
+    # remove the x and y ticks
+    for i in range(4):
+        ax[i].set_xticks([])
+        ax[i].set_yticks([])
+        ax[i].title.set_fontsize(20)
+    # save the figure
+    plt_name = title + '.png'
+    plt_dir = './graphs/'
+    plt_path = plt_dir + plt_name
+    plt.savefig(plt_path)
+    plt.show()
+
+
+four_consecutive_plot_generator(img1=plt.imread('./graphs/pls_movie.png'),
+                                img2=plt.imread('./graphs/Hurst_Movie.png'),
+                                img3=plt.imread('./graphs/FC_Movie.png'),
+                                img4=plt.imread('./graphs/FC_Movie_brain.png'),
+                                figure_length=15,
+                                figure_width=30,
+                                title1='(a) Combined Effects PLS - Hurst',
+                                title2='(b) Significant Brain Nodes in PLS - Hurst',
+                                title3='(c) Combined Effects PLS - General FC',
+                                title4='(d) Significant Brain Nodes in PLS - General FC',
+                                title='Combined Effects',
+                                orientation='vertical',
+                                dpi=650)
+
+
+
+
+
 
 SL_DFA = plt.imread('./graphs/SL-DFA.png')
 NL_DFA = plt.imread('./graphs/NL-DFA.png')
 
 fig, ax = plt.subplots(1, 2, figsize=(10, 6), sharey=True, constrained_layout=True)
+ax[0].set_position([0.05, 0.025, 0.45, 0.95])
+ax[1].set_position([0.50, 0.025, 0.45, 0.95])
 ax[0].imshow(SL_DFA)
-ax[0].set_title('Main Effect of Sedation Level - DFA')
+ax[0].set_title('Main Effect of Sedation Level')
 # remove the x and y ticks
 ax[0].set_xticks([])
 ax[0].set_yticks([])
 ax[1].imshow(NL_DFA)
-ax[1].set_title('Main Effect of Narrative Listening - DFA')
+ax[1].set_title('Main Effect of Narrative Listening')
 # remove the x and y ticks
 ax[1].set_xticks([])
 ax[1].set_yticks([])

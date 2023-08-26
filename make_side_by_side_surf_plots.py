@@ -23,7 +23,7 @@ def make_side_by_side_surf_plots(name,texture,vmin=None,vmax=None, cmap='RdBu', 
     norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax) # the max and min of values in colorbar
     cb_ax = fig.add_axes([0.2, 0.1, 0.6, 0.02]) # add axes for colorbar
     cb = fig.colorbar(matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cb_ax, orientation='horizontal')
-    cb.set_label(label=name,size=16) # customize colorbar label font
+    # cb.set_label(label=name,size=16) # customize colorbar label font
     cb.ax.tick_params(labelsize=14) # customize colorbar tick font
     # make the colorbar ticks to have only 5 ticks
     cb.locator = matplotlib.ticker.MaxNLocator(nbins=5)
@@ -70,7 +70,7 @@ def make_side_by_side_surf_plots_left(name,texture,vmin=None,vmax=None, cmap='Rd
     norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax) # the max and min of values in colorbar
     cb_ax = fig.add_axes([0.2, 0.1, 0.6, 0.02]) # add axes for colorbar
     cb = fig.colorbar(matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cb_ax, orientation='horizontal')
-    cb.set_label(label=name,size=16) # customize colorbar label font
+    # cb.set_label(label=name,size=16) # customize colorbar label font
     cb.ax.tick_params(labelsize=14) # customize colorbar tick font
     # make the colorbar ticks to have only 5 ticks
     cb.locator = matplotlib.ticker.MaxNLocator(nbins=5)

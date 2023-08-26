@@ -36,6 +36,7 @@ edges_lv_vals_effect_of_movie = sio.loadmat('./data_generated/PLS_outputTaskPLSe
 edges_lv_vals_rest_last_60_TR = sio.loadmat('./data_generated/PLS_outputTaskPLSedges_rest_last_60_TR_lv_vals.mat')
 edges_lv_vals_double_two_way = sio.loadmat('./data_generated/PLS_outputTaskPLSedges_double_two_way_lv_vals.mat')
 edges_lv_vals_rest_post_hoc = sio.loadmat('./data_generated/PLS_outputTaskPLSedges_rest_post_hoc_lv_vals.mat')
+edges_lv_vals_combined = sio.loadmat('./data_generated/PLS_outputTaskPLSedges_combined_lv_vals.mat')
 
 corr = spearmanr(fc_lv_vals_double_three_way['u1'][:, 0], fc_lv_vals_double_two_way['u1'][:, 0])
 corr_1 = spearmanr(fc_lv_vals_double_two_way['u1'][:, 0], fc_lv_vals_double_merged['u1'][:, 0])
@@ -72,6 +73,7 @@ edges_boot_ratio_effect_of_movie = sio.loadmat('./data_generated/PLS_outputTaskP
 edges_boot_ratio_rest_last_60_TR = sio.loadmat('./data_generated/PLS_outputTaskPLSedges_rest_last_60_TR.mat')
 edges_boot_ratio_double_two_way = sio.loadmat('./data_generated/PLS_outputTaskPLSedges_double_two_way.mat')
 edges_boot_ratio_rest_post_hoc = sio.loadmat('./data_generated/PLS_outputTaskPLSedges_rest_post_hoc.mat')
+edges_boot_ratio_combined = sio.loadmat('./data_generated/PLS_outputTaskPLSedges_combined.mat')
 
 # load the missing nodes
 double_nan = np.load('./data_generated/double_missing.npy')
@@ -89,6 +91,7 @@ edges_effect_of_movie_nan = np.load('./data_generated/missing_edges_effect_of_mo
 edges_rest_last_60_TR_nan = np.load('./data_generated/missing_edges_rest_last_60_TR.npy')
 edges_double_nan = np.load('./data_generated/missing_edges_double.npy')
 edges_rest_post_hoc_nan = np.load('./data_generated/missing_edges_rest_post_hoc.npy')
+edges_combined_nan = np.load('./data_generated/missing_edges_combined.npy')
 
 
 # # find the union set between df_movie_missing and df_last_60_TR_missing
@@ -171,6 +174,7 @@ new_df_edges_double_two_way = plot_preparation(edges_lv_vals_double_two_way, edg
                                                edges_double_nan)
 new_df_edges_rest_post_hoc = plot_preparation(edges_lv_vals_rest_post_hoc, edges_boot_ratio_rest_post_hoc,
                                               edges_rest_post_hoc_nan)
+new_df_edges_combined = plot_preparation(edges_lv_vals_combined, edges_boot_ratio_combined, edges_combined_nan)
 
 
 def plot_preparation_for_2ndLV(lv_vals, boot_ratio, nodes_with_missing_values):
@@ -215,4 +219,4 @@ def plot_preparation_for_2ndLV(lv_vals, boot_ratio, nodes_with_missing_values):
 # new_df_movie_01_2 = plot_preparation_for_2ndLV(lv_vals_movie_01_2, boot_ratio_movie_01_2, df_01_missing)
 
 
-print('plotting_prepares has been read')
+print('plotting_preparation has been read')

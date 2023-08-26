@@ -30,7 +30,7 @@ def distance_mat_generator(nan_columns, file_name=None):
     print(f'atlas distance matrix file done: {file_name}')
 
 
-distance_mat_generator(nan_all_for_spearman_r, 'shen_distance_fc.npy')
+# distance_mat_generator(nan_all_for_spearman_r, 'shen_distance_fc.npy')
 
 
 def surrogate_generator(target_data, distance_mat, surrogate_name):
@@ -71,7 +71,7 @@ for i in nan_columns:
 
 
 
-atlas_distance_mat_file = 'shen_distance.npy'
+atlas_distance_mat_file = './data_generated/shen_distance.npy'
 if not Path(atlas_distance_mat_file).exists():
     coords = find_parcellation_cut_coords(atlas)
     dm = []
@@ -88,7 +88,7 @@ else:
 print(f'atlas distance matrix file done: {atlas_distance_mat_file}')
 
 
-atlas_distance_mat_file_mild_pls = 'shen_distance_mild_pls.npy'
+atlas_distance_mat_file_mild_pls = './data_generated/shen_distance_mild_pls.npy'
 if not Path(atlas_distance_mat_file_mild_pls).exists():
     coords = find_parcellation_cut_coords(atlas)
     # delete rows in nan_columns_mild
@@ -106,7 +106,7 @@ else:
 
 print(f'atlas distance matrix file done: {atlas_distance_mat_file_mild_pls}')
 
-atlas_distance_mat_file_deep_pls = 'shen_distance_deep_pls.npy'
+atlas_distance_mat_file_deep_pls = './data_generated/shen_distance_deep_pls.npy'
 if not Path(atlas_distance_mat_file_deep_pls).exists():
     coords = find_parcellation_cut_coords(atlas)
     # delete rows in nan_columns
@@ -251,8 +251,8 @@ terms = [
 'working_memory']
 
 
-kept_terms_file = 'neurosynth_terms.npy'
-kept_terms_map_file = 'neurosynth_terms_parcel_maps.npy'
+kept_terms_file = './data_generated/neurosynth_terms.npy'
+kept_terms_map_file = './data_generated/neurosynth_terms_parcel_maps.npy'
 term_files = [kept_terms_file, kept_terms_map_file]
 files_exist = sum([Path(x).exists() for x in term_files])
 if files_exist <2:
@@ -268,7 +268,7 @@ else:
 
 print(f'kept terms file done: {kept_terms_file}')
 
-term_sur_file ='term_surrogates.npy'
+term_sur_file ='./data_generated/term_surrogates.npy'
 if not Path(term_sur_file).exists():
     term_surrogates = []
     for i in range(len(kept_terms)):
@@ -284,7 +284,7 @@ else:
 print(f'term surrogates file done: {term_sur_file}')
 
 
-term_sur_file_deep ='term_surrogates_deep.npy'
+term_sur_file_deep ='./data_generated/term_surrogates_deep.npy'
 if not Path(term_sur_file_deep).exists():
     term_surrogates_deep = []
     # convert to numpy array
@@ -301,7 +301,7 @@ else:
 
 print(f'term surrogates deep file done: {term_sur_file_deep}')
 
-term_sur_file_mild ='term_surrogates_mild.npy'
+term_sur_file_mild ='./data_generated/term_surrogates_mild.npy'
 if not Path(term_sur_file_mild).exists():
     term_surrogates_mild = []
     # convert to numpy array
@@ -318,7 +318,7 @@ else:
 
 print(f'term surrogates mild file done: {term_sur_file_mild}')
 
-term_sur_file_mild_pls ='term_surrogates_mild_pls.npy'
+term_sur_file_mild_pls ='./data_generated/term_surrogates_mild_pls.npy'
 if not Path(term_sur_file_mild_pls).exists():
     term_surrogates_mild_pls = []
     gen = Base(lv_vals_mild_first, distance_mat_mild_pls)
@@ -331,7 +331,7 @@ else:
 
 print(f'term surrogates mild pls file done: {term_sur_file_mild_pls}')
 
-term_sur_file_deep_pls ='term_surrogates_deep_pls.npy'
+term_sur_file_deep_pls ='./data_generated/term_surrogates_deep_pls.npy'
 if not Path(term_sur_file_deep_pls).exists():
     term_surrogates_deep_pls = []
     gen = Base(lv_vals_deep_first, distance_mat_deep_pls)
@@ -345,10 +345,12 @@ else:
 print(f'term surrogates deep pls file done: {term_sur_file_deep_pls}')
 
 
-distance_mat_fc = np.load('shen_distance_fc.npy')
-lv_val_movie = loadings[:, 3]
-lv_val_rest = loadings[:, 4]
-lv_val_effect_of_movie = loadings[:, 5]
-surrogate_generator(lv_val_movie, distance_mat_fc, 'fc_surrogates_movie.npy')
-surrogate_generator(lv_val_rest, distance_mat_fc, 'fc_surrogates_rest.npy')
-surrogate_generator(lv_val_effect_of_movie, distance_mat_fc, 'fc_surrogates_effect_of_movie.npy')
+distance_mat_fc = np.load('./data_generated/shen_distance_fc.npy')
+lv_val_movie = loadings[:, 4]
+lv_val_rest = loadings[:, 5]
+lv_val_effect_of_movie = loadings[:, 6]
+lv_val_combined = loadings[:, 7]
+# surrogate_generator(lv_val_movie, distance_mat_fc, 'fc_surrogates_movie.npy')
+# surrogate_generator(lv_val_rest, distance_mat_fc, 'fc_surrogates_rest.npy')
+# surrogate_generator(lv_val_effect_of_movie, distance_mat_fc, 'fc_surrogates_effect_of_movie.npy')
+surrogate_generator(lv_val_combined, distance_mat_fc, 'fc_surrogates_combined.npy')

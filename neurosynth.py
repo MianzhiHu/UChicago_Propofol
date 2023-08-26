@@ -18,14 +18,14 @@ import pandas as pd
 
 n = 10000
 
-distance_mat = np.load('shen_distance.npy', allow_pickle=True)
-kept_terms = np.load('neurosynth_terms.npy', allow_pickle=True)
-kept_terms_maps = np.load('neurosynth_terms_parcel_maps.npy', allow_pickle=True)
-term_surrogates = np.load('term_surrogates.npy', allow_pickle=True)
-term_surrogates_deep = np.load('term_surrogates_deep.npy', allow_pickle=True)
-term_surrogates_mild = np.load('term_surrogates_mild.npy', allow_pickle=True)
-term_surrogates_mild_pls = np.load('term_surrogates_mild_pls.npy', allow_pickle=True)
-term_surrogates_deep_pls = np.load('term_surrogates_deep_pls.npy', allow_pickle=True)
+distance_mat = np.load('./data_generated/shen_distance.npy', allow_pickle=True)
+kept_terms = np.load('./data_generated/neurosynth_terms.npy', allow_pickle=True)
+kept_terms_maps = np.load('./data_generated/neurosynth_terms_parcel_maps.npy', allow_pickle=True)
+term_surrogates = np.load('./data_generated/term_surrogates.npy', allow_pickle=True)
+term_surrogates_deep = np.load('./data_generated/term_surrogates_deep.npy', allow_pickle=True)
+term_surrogates_mild = np.load('./data_generated/term_surrogates_mild.npy', allow_pickle=True)
+term_surrogates_mild_pls = np.load('./data_generated/term_surrogates_mild_pls.npy', allow_pickle=True)
+term_surrogates_deep_pls = np.load('./data_generated/term_surrogates_deep_pls.npy', allow_pickle=True)
 
 fc_movie_nan = np.load('./data_generated/fc_movie_nan.npy')
 fc_rest_nan = np.load('./data_generated/fc_rest_nan.npy')
@@ -108,7 +108,9 @@ def neurosynth_hurst(file_path, kept_terms_maps, term_surrogates, p_value, df_mo
     plt.xlabel('Neurosynth terms')
     ax.set_ylim(-.65, .7)
     plt.tight_layout()
+    plt.savefig('./graphs/PLS_neurosynth_hurst.png')
     plt.show()
+
 
 
 # neurosynth_hurst('./data_generated/PLS_outputTaskPLShurst_propofol_movie_lv_vals.mat',kept_terms_maps, term_surrogates, 0.01, df_movie_missing)
@@ -120,80 +122,80 @@ def neurosynth_hurst(file_path, kept_terms_maps, term_surrogates, p_value, df_mo
 # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_movie_abs_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, fc_movie_nan)
 # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_movie_lv_vals.mat', kept_terms_maps,term_surrogates, 0.01, fc_movie_nan)
 # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_rest_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, fc_rest_nan)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLSlast_60_TR_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, df_last_60_TR_missing)
+# neurosynth_hurst('./data_generated/PLS_outputTaskPLSlast_60_TR_lv_vals.mat', kept_terms_maps,term_surrogates, 0.01, df_last_60_TR_missing)
 # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_rest_last_60_TR_lv_vals.mat', kept_terms_maps,term_surrogates, 0.01, fc_rest_nan_last_60_TR)
 # neurosynth_hurst('./data_generated/PLS_outputTaskPLSeffect_of_movie_lv_vals.mat', kept_terms_maps,term_surrogates, 0.01, effect_of_movie_nan)
 # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_effect_of_movie_lv_vals.mat', kept_terms_maps,term_surrogates, 0.01, fc_effect_of_movie_nan)
 # neurosynth_hurst('./data_generated/PLS_outputTaskPLStwo-way double_lv_vals.mat', kept_terms_maps, term_surrogates, 0.01, double_nan)
 # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_double_two_way_lv_vals.mat', kept_terms_maps, term_surrogates, 0.01, fc_double_nan)
 # neurosynth_hurst('./data_generated/PLS_outputTaskPLScombined_lv_vals.mat', kept_terms_maps, term_surrogates, 0.01, df_combined_missing)
-neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_combined_lv_vals.mat', kept_terms_maps, term_surrogates, 0.01, fc_combined_nan)
+# neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_combined_lv_vals.mat', kept_terms_maps, term_surrogates, 0.01, fc_combined_nan)
 
-# compute the correlation between the first loadings and the rest of the loadings
-# load the matrix
-lv_vals_mild_map = sio.loadmat('./data_generated/u1_df_mild.mat')
-lv_vals_mild_map = lv_vals_mild_map['u1_df_mild']
-lv_vals_mild_first = lv_vals_mild_map[:, 0]
-
-lv_vals_deep_map = sio.loadmat('./data_generated/u1_df_deep.mat')
-lv_vals_deep_map = lv_vals_deep_map['u1_df_deep']
-lv_vals_deep_first = lv_vals_deep_map[:, 0]
-
-
-# preallocate a dataframe to store the results
-df_mild_corr: list = []
-df_mild_pval: list = []
-df_deep_corr: list = []
-df_deep_pval: list = []
-
-
-for i in range(lv_vals_mild_map.shape[1]):
-    corr = spearmanr(lv_vals_mild_first, lv_vals_mild_map[:,i]).flatten()
-    df_mild_corr.append(corr)
-    pvals = np.vstack([(np.abs(corr)<np.abs(spearmanr(lv_vals_mild_map[:,i],term_surrogates_mild_pls))).sum()/n])
-    pvals = np.hstack([max(x,1/n) for x in pvals])
-    df_mild_pval.append(pvals)
-
-
-df_mild_corr = np.array(df_mild_corr)
-df_mild_pval = np.array(df_mild_pval)
-
-
-for i in range(lv_vals_deep_map.shape[1]):
-    corr_deep = spearmanr(lv_vals_deep_first, lv_vals_deep_map[:,i]).flatten()
-    df_deep_corr.append(corr_deep)
-    pvals_deep = np.vstack([(np.abs(corr_deep)<np.abs(spearmanr(lv_vals_deep_map[:,i],term_surrogates_deep_pls))).sum()/n])
-    pvals_deep = np.hstack([max(x,1/n) for x in pvals_deep])
-    df_deep_pval.append(pvals_deep)
-
-
-df_deep_corr = np.array(df_deep_corr)
-df_deep_pval = np.array(df_deep_pval)
-
-
-# plot df_mild_corr and df_mild_pval together
-plt.plot(df_mild_corr, label='correlation')
-plt.ylabel('Spatial Correlation With First Window - Mild')
-plt.xlabel('Window Number')
-ax = plt.twinx()
-ax.plot(df_mild_pval, color='red', label='p-value')
-ax.axhline(0.05, color='black', linestyle='--', label='p = 0.05')
-plt.ylabel('p-value')
-plt.legend()
-plt.savefig('./graphs/PLS_mild_correlation.png')
-plt.show()
-
-
-plt.plot(df_deep_corr, label='correlation')
-plt.ylabel('Spatial Correlation With First Window - Deep')
-plt.xlabel('Window Number')
-ax = plt.twinx()
-ax.plot(df_deep_pval, color='red', label='p-value')
-ax.axhline(0.05, color='black', linestyle='--', label='p = 0.05')
-plt.ylabel('p-value')
-plt.legend()
-plt.savefig('./graphs/PLS_deep_correlation.png')
-plt.show()
+# # compute the correlation between the first loadings and the rest of the loadings
+# # load the matrix
+# lv_vals_mild_map = sio.loadmat('./data_generated/u1_df_mild.mat')
+# lv_vals_mild_map = lv_vals_mild_map['u1_df_mild']
+# lv_vals_mild_first = lv_vals_mild_map[:, 0]
+#
+# lv_vals_deep_map = sio.loadmat('./data_generated/u1_df_deep.mat')
+# lv_vals_deep_map = lv_vals_deep_map['u1_df_deep']
+# lv_vals_deep_first = lv_vals_deep_map[:, 0]
+#
+#
+# # preallocate a dataframe to store the results
+# df_mild_corr: list = []
+# df_mild_pval: list = []
+# df_deep_corr: list = []
+# df_deep_pval: list = []
+#
+#
+# for i in range(lv_vals_mild_map.shape[1]):
+#     corr = spearmanr(lv_vals_mild_first, lv_vals_mild_map[:,i]).flatten()
+#     df_mild_corr.append(corr)
+#     pvals = np.vstack([(np.abs(corr)<np.abs(spearmanr(lv_vals_mild_map[:,i],term_surrogates_mild_pls))).sum()/n])
+#     pvals = np.hstack([max(x,1/n) for x in pvals])
+#     df_mild_pval.append(pvals)
+#
+#
+# df_mild_corr = np.array(df_mild_corr)
+# df_mild_pval = np.array(df_mild_pval)
+#
+#
+# for i in range(lv_vals_deep_map.shape[1]):
+#     corr_deep = spearmanr(lv_vals_deep_first, lv_vals_deep_map[:,i]).flatten()
+#     df_deep_corr.append(corr_deep)
+#     pvals_deep = np.vstack([(np.abs(corr_deep)<np.abs(spearmanr(lv_vals_deep_map[:,i],term_surrogates_deep_pls))).sum()/n])
+#     pvals_deep = np.hstack([max(x,1/n) for x in pvals_deep])
+#     df_deep_pval.append(pvals_deep)
+#
+#
+# df_deep_corr = np.array(df_deep_corr)
+# df_deep_pval = np.array(df_deep_pval)
+#
+#
+# # plot df_mild_corr and df_mild_pval together
+# plt.plot(df_mild_corr, label='correlation')
+# plt.ylabel('Spatial Correlation With First Window - Mild')
+# plt.xlabel('Window Number')
+# ax = plt.twinx()
+# ax.plot(df_mild_pval, color='red', label='p-value')
+# ax.axhline(0.05, color='black', linestyle='--', label='p = 0.05')
+# plt.ylabel('p-value')
+# plt.legend()
+# plt.savefig('./graphs/PLS_mild_correlation.png')
+# plt.show()
+#
+#
+# plt.plot(df_deep_corr, label='correlation')
+# plt.ylabel('Spatial Correlation With First Window - Deep')
+# plt.xlabel('Window Number')
+# ax = plt.twinx()
+# ax.plot(df_deep_pval, color='red', label='p-value')
+# ax.axhline(0.05, color='black', linestyle='--', label='p = 0.05')
+# plt.ylabel('p-value')
+# plt.legend()
+# plt.savefig('./graphs/PLS_deep_correlation.png')
+# plt.show()
 
 # now, calculate the same for hurst values
 # def read_hurst (directory: str):

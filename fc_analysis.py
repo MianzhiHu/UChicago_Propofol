@@ -7,7 +7,7 @@ from scipy import stats
 from plotting_preparation import fc_lv_vals_movie, fc_lv_vals_rest, \
     fc_movie_nan, fc_rest_nan, lv_vals, lv_vals_rest_last_60_TR, lv_vals_effect_of_movie, \
     df_movie_missing, df_last_60_TR_missing, effect_of_movie_nan, fc_lv_vals_effect_of_movie, \
-    fc_effect_of_movie_nan, fc_lv_vals_rest_last_60_TR
+    fc_effect_of_movie_nan, fc_lv_vals_rest_last_60_TR, fc_lv_vals_combined, lv_vals_combined
 from brainsmash.mapgen.stats import spearmanr
 from sklearn.linear_model import LinearRegression
 import statsmodels.api as sm
@@ -71,8 +71,6 @@ def scatter_plot():
 
     # take the row means and remove all the columns
     df_fc = df_fc.mean(axis=1)
-
-
 
     with open('outcome_268.pickle', 'rb') as h:
         hurst_dict = pickle.load(h)
@@ -272,8 +270,8 @@ fc_movie_clean = fc_movie.drop(fc_all_nan, axis=1).drop(fc_all_nan, axis=0)
 fc_rest_clean = fc_rest.drop(fc_all_nan, axis=1).drop(fc_all_nan, axis=0)
 
 fc_movie_effect_of_movie = fc_movie_awake.drop(fc_effect_of_movie_nan, axis=1).drop(fc_effect_of_movie_nan, axis=0)
-fc_rest_effect_of_movie = fc_rest_awake_last_60_TR.drop(fc_effect_of_movie_nan, axis=1).drop(fc_effect_of_movie_nan, axis=0)
-
+fc_rest_effect_of_movie = fc_rest_awake_last_60_TR.drop(fc_effect_of_movie_nan, axis=1).drop(fc_effect_of_movie_nan,
+                                                                                             axis=0)
 
 fc_rest_awake_last_60_TR_clean = fc_rest_awake_last_60_TR.drop(fc_rest_nan_last_60_TR, axis=1).drop(
     fc_rest_nan_last_60_TR, axis=0)
@@ -292,9 +290,6 @@ fc_double_movie_deep = fc_movie_deep.drop(fc_double_nan, axis=1).drop(
     fc_double_nan, axis=0)
 # take the average of the two movie fc matrices
 fc_double_movie = (fc_double_movie_mild + fc_double_movie_deep) / 2
-
-
-
 
 # # save the cleaned fc matrices as csv files
 # fc_movie_awake_clean.to_csv('./data_generated/fc_movie_awake_abs.csv', index=False, header=False)
@@ -442,31 +437,36 @@ nan_all_for_spearman_r = list(set(fc_movie_nan).union(set(fc_rest_nan_last_60_TR
 fc_movie_loadings = prepare_for_spearman_r(fc_lv_vals_movie, nan_all_for_spearman_r)
 fc_rest_loadings = prepare_for_spearman_r(fc_lv_vals_rest_last_60_TR, nan_all_for_spearman_r)
 fc_effect_of_movie_loadings = prepare_for_spearman_r(fc_lv_vals_effect_of_movie, nan_all_for_spearman_r)
+fc_combined_loadings = prepare_for_spearman_r(fc_lv_vals_combined, nan_all_for_spearman_r)
 hurst_movie_loadings = prepare_for_spearman_r(lv_vals, nan_all_for_spearman_r)
 hurst_rest_loadings = prepare_for_spearman_r(lv_vals_rest_last_60_TR, nan_all_for_spearman_r)
 hurst_effect_of_movie_loadings = prepare_for_spearman_r(lv_vals_effect_of_movie, nan_all_for_spearman_r)
+hurst_combined_loadings = prepare_for_spearman_r(lv_vals_combined, nan_all_for_spearman_r)
 
 # stack the dataframes
-loadings = pd.concat([fc_movie_loadings, fc_rest_loadings, fc_effect_of_movie_loadings, hurst_movie_loadings,
-                      hurst_rest_loadings, hurst_effect_of_movie_loadings], axis=1).dropna(axis=0, how='any').to_numpy()
+loadings = pd.concat([fc_movie_loadings, fc_rest_loadings, fc_effect_of_movie_loadings, fc_combined_loadings, hurst_movie_loadings,
+                      hurst_rest_loadings, hurst_effect_of_movie_loadings, hurst_combined_loadings], axis=1).dropna(axis=0, how='any').to_numpy()
 
 # calculate the spearman correlation
-corr_movie = stats.spearmanr(loadings[:, 0], loadings[:, 3])
-corr_rest = stats.spearmanr(loadings[:, 1], loadings[:, 4])
-corr_effect_of_movie = stats.spearmanr(loadings[:, 2], loadings[:, 5])
+corr_movie = stats.spearmanr(loadings[:, 0], loadings[:, 4])
+corr_rest = stats.spearmanr(loadings[:, 1], loadings[:, 5])
+corr_effect_of_movie = stats.spearmanr(loadings[:, 2], loadings[:, 6])
+corr_effect_of_movie_vs_propofol = stats.spearmanr(loadings[:, 5], loadings[:, 6])
 
 # now, verify the results using the spin test
 # load the surrogates
-fc_surrogates_movie = np.load('fc_surrogates_movie.npy')
-fc_surrogates_rest = np.load('fc_surrogates_rest.npy')
-fc_surrogates_effect_of_movie = np.load('fc_surrogates_effect_of_movie.npy')
+fc_surrogates_movie = np.load('./data_generated/fc_surrogates_movie.npy')
+fc_surrogates_rest = np.load('./data_generated/fc_surrogates_rest.npy')
+fc_surrogates_effect_of_movie = np.load('./data_generated/fc_surrogates_effect_of_movie.npy')
+fc_surrogates_combined = np.load('./data_generated/fc_surrogates_combined.npy')
 
 # preallocate the lists
 pval_movie_surrogates = []
 pval_rest_surrogates = []
 pval_effect_of_movie_surrogates = []
 
-def spin_test_for_hurst_versus_fc (hurst, fc, surrogates, n, empty_pval_list):
+
+def spin_test_for_hurst_versus_fc(hurst, fc, surrogates, n, empty_pval_list):
     corr = spearmanr(hurst, fc)[0]
     pvals = np.vstack([(np.abs(corr) < np.abs(spearmanr(fc, surrogates))).sum() / n])
     pvals = np.hstack([max(x, 1 / n) for x in pvals])
@@ -475,14 +475,21 @@ def spin_test_for_hurst_versus_fc (hurst, fc, surrogates, n, empty_pval_list):
     return corr, empty_pval_list
 
 
-corr_movie_surrogates, pval_movie_surrogates = spin_test_for_hurst_versus_fc(loadings[:, 0], loadings[:, 3],
+corr_movie_surrogates, pval_movie_surrogates = spin_test_for_hurst_versus_fc(loadings[:, 0], loadings[:, 4],
                                                                              fc_surrogates_movie, 10000,
                                                                              pval_movie_surrogates)
-corr_rest_surrogates, pval_rest_surrogates = spin_test_for_hurst_versus_fc(loadings[:, 1], loadings[:, 4],
-                                                                            fc_surrogates_rest, 10000,
-                                                                            pval_rest_surrogates)
+corr_rest_surrogates, pval_rest_surrogates = spin_test_for_hurst_versus_fc(loadings[:, 1], loadings[:, 5],
+                                                                           fc_surrogates_rest, 10000,
+                                                                           pval_rest_surrogates)
 corr_effect_of_movie_surrogates, pval_effect_of_movie_surrogates = spin_test_for_hurst_versus_fc(loadings[:, 2],
-                                                                                                    loadings[:, 5],
-                                                                                                    fc_surrogates_effect_of_movie,
-                                                                                                    10000,
-                                                                                                    pval_effect_of_movie_surrogates)
+                                                                                                 loadings[:, 6],
+                                                                                                 fc_surrogates_effect_of_movie,
+                                                                                                 10000,
+                                                                                                 pval_effect_of_movie_surrogates)
+corr_combined_surrogates, pval_combined_surrogates = spin_test_for_hurst_versus_fc(loadings[:, 3], loadings[:, 7],
+                                                                                      fc_surrogates_combined, 10000,
+                                                                                        [])
+corr_fc_effect_of_movie_vs_propofol_surrogates, pval_fc_effect_of_movie_vs_propofol_surrogates = spin_test_for_hurst_versus_fc(
+    loadings[:, 1], loadings[:, 2], fc_surrogates_effect_of_movie, 10000, [])
+corr_hurst_effect_of_movie_vs_propofol_surrogates, pval_hurst_effect_of_movie_vs_propofol_surrogates = spin_test_for_hurst_versus_fc(
+    loadings[:, 5], loadings[:, 6], fc_surrogates_effect_of_movie, 10000, [])

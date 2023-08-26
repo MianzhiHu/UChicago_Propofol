@@ -45,7 +45,7 @@ fc_combined = new_df_fc_combined.iloc[:, 0].tolist()
 # nodes_with_hurst_values_02 = [i for i, x in enumerate(hurst_movie_02) if str(x) != 'nan']
 # nodes_with_hurst_values_01_3 = [i for i, x in enumerate(hurst_movie_01_3) if str(x) != 'nan']
 # nodes_with_hurst_values_everything = [i for i, x in enumerate(hurst_everything) if str(x) != 'nan']
-# nodes_with_hurst_values_last_60_TR = [i for i, x in enumerate(hurst_last_60_TR) if str(x) != 'nan']
+nodes_with_hurst_values_last_60_TR = [i for i, x in enumerate(hurst_last_60_TR) if str(x) != 'nan']
 # nodes_with_hurst_values_effect_of_movie = [i for i, x in enumerate(hurst_effect_of_movie) if str(x) != 'nan']
 # nodes_with_hurst_double_three_way = [i for i, x in enumerate(hurst_double_three_way) if str(x) != 'nan']
 # nodes_with_hurst_double_two_way = [i for i, x in enumerate(hurst_double_two_way) if str(x) != 'nan']
@@ -65,7 +65,7 @@ fc_combined = new_df_fc_combined.iloc[:, 0].tolist()
 # np.save('./data_generated/nodes_with_hurst_values_03.npy', nodes_with_hurst_values_03)
 # np.save('./data_generated/nodes_with_hurst_values_02.npy', nodes_with_hurst_values_02)
 # np.save('./data_generated/nodes_with_hurst_values_01_3.npy', nodes_with_hurst_values_01_3)
-# np.save('./data_generated/nodes_with_hurst_values_last_60_TR.npy', nodes_with_hurst_values_last_60_TR)
+np.save('./data_generated/nodes_with_hurst_values_last_60_TR.npy', nodes_with_hurst_values_last_60_TR)
 # np.save('./data_generated/nodes_with_fc_values.npy', nodes_with_fc_values)
 # np.save('./data_generated/nodes_with_fc_values_rest.npy', nodes_with_fc_values_rest)
 # np.save('./data_generated/nodes_with_fc_values_abs.npy', nodes_with_fc_values_abs)
@@ -154,19 +154,19 @@ def brain_plotting (df, title, vmin, vmax, cmap, nodes_with_missing_values=None)
 # brain_plotting(hurst_everything, 'brain loadings - all', 0, 0.15, 'Reds')
 # brain_plotting(fc_movie, 'brain loadings - fc', -0.25, 0.25, 'RdBu_r')
 # brain_plotting(fc_rest, 'brain loadings - fc', 0, 0.25, 'Blues')
-# brain_plotting(fc_rest_last_60_TR, 'brain loadings - last 60 TR', 0, 0.2, 'Blues')
+# brain_plotting(fc_rest_last_60_TR, 'Effect of Propofol - FC', 0, 0.2, 'Blues')
 # brain_plotting(fc_movie_abs, 'brain loadings - fc', 0, 0.2, 'Blues')
-# brain_plotting(fc_effect_of_movie, 'brain loadings - fc', 0, 0.2, 'Blues')
+# brain_plotting(fc_effect_of_movie, 'Effect of Narrative Listening - FC', vmin=0, vmax=0.2, cmap='Blues')
 # brain_plotting(fc_double_three_way, 'brain loadings - fc', 0, 0.2, 'Blues')
 # brain_plotting(fc_double_two_way, 'brain loadings - fc', 0, 0.2, 'Blues')
 # brain_plotting(fc_double_merged, 'brain loadings - fc', 0, 0.2, 'Blues')
-# brain_plotting(hurst_last_60_TR, 'brain loadings - last 60 TR', 0, 0.16, 'Blues')
-# brain_plotting(hurst_effect_of_movie, 'brain loadings - effect of movie', 0, 0.15, 'Blues')
+# brain_plotting(hurst_last_60_TR, 'Effect of Propofol - Hurst', 0, 0.16, 'Blues')
+# brain_plotting(hurst_effect_of_movie, 'Effect of Narrative Listening - Hurst', vmin=0, vmax=0.15, cmap='Blues')
 # brain_plotting(hurst_double_three_way, 'brain loadings - double three way', 0, 0.2, 'Blues')
 # brain_plotting(hurst_double_two_way, 'brain loadings - double two way', 0, 0.2, 'Blues')
 # brain_plotting(hurst_double_merged, 'brain loadings - double merged', 0, 0.2, 'Blues')
-# brain_plotting(hurst_combined, 'brain loadings - combined', 0, 0.15, 'Reds')
-brain_plotting(fc_combined, 'brain loadings - combined', 0, 0.20, 'Reds')
+# brain_plotting(hurst_combined, 'Combined Effects - Hurst', 0, 0.15, 'Reds')
+# brain_plotting(fc_combined, 'Combined Effects - FC', 0, 0.20, 'Reds')
 
 
 def brain_plotting_left (df, title, vmin, vmax, cmap, nodes_with_missing_values=None):
@@ -204,19 +204,19 @@ def brain_plotting_left (df, title, vmin, vmax, cmap, nodes_with_missing_values=
 # brain_plotting_left(hurst_everything, 'brain loadings everything', 0, 0.15, 'Reds')
 # brain_plotting_left(fc_movie, 'brain loadings - fc', -0.25, 0.25, 'RdBu_r')
 # brain_plotting_left(fc_rest, 'brain loadings - fc', 0, 0.25, 'Blues')
-# brain_plotting_left(fc_rest_last_60_TR, 'brain loadings - last 60 TR', 0, 0.2, 'Blues')
+# brain_plotting_left(fc_rest_last_60_TR, 'Effect of Propofol - FC', 0, 0.2, 'Blues')
 # brain_plotting_left(fc_movie_abs, 'brain loadings - fc', 0, 0.2, 'Reds')
-# brain_plotting_left(fc_effect_of_movie, 'brain loadings - fc', 0, 0.2, 'Blues')
+# brain_plotting_left(fc_effect_of_movie, 'Effect of Narrative Listening - FC (left)', 0, 0.2, 'Blues')
 # brain_plotting_left(fc_double_three_way, 'brain loadings - fc', 0, 0.2, 'Blues')
 # brain_plotting_left(fc_double_two_way, 'brain loadings - fc', 0, 0.2, 'Blues')
 # brain_plotting_left(fc_double_merged, 'brain loadings - fc', 0, 0.2, 'Blues')
-# brain_plotting_left(hurst_last_60_TR, 'brain loadings - last 60 TR', 0, 0.16, 'Blues')
-# brain_plotting_left(hurst_effect_of_movie, 'brain loadings - effect of movie', 0, 0.15, 'Blues')
+# brain_plotting_left(hurst_last_60_TR, 'Effect of Propofol - Hurst', 0, 0.16, 'Blues')
+# brain_plotting_left(hurst_effect_of_movie, 'Effect of Narrative Listening - Hurst (left)', 0, 0.15, 'Blues')
 # brain_plotting_left(hurst_double_three_way, 'brain loadings - double three way', 0, 0.2, 'Blues')
 # brain_plotting_left(hurst_double_two_way, 'brain loadings - double two way', 0, 0.2, 'Blues')
 # brain_plotting_left(hurst_double_merged, 'brain loadings - double merged', 0, 0.2, 'Blues')
-# brain_plotting_left(hurst_combined, 'brain loadings - combined', 0, 0.15, 'Reds')
-brain_plotting_left(fc_combined, 'brain loadings - combined', 0, 0.20, 'Reds')
+# brain_plotting_left(hurst_combined, 'Combined Effects - Hurst', 0, 0.15, 'Reds')
+# brain_plotting_left(fc_combined, 'Combined Effects - FC', 0, 0.20, 'Reds')
 
 # # plot using nilearn
 # visual_attention = nibabel.load('./Neurosynth/visual perception_association-test_z_FDR_0.01.nii.gz')
@@ -236,8 +236,10 @@ brain_plotting_left(fc_combined, 'brain loadings - combined', 0, 0.20, 'Reds')
 # cb1.set_ticks([])
 # plt.delaxes(ax[0, 1])
 # plt.delaxes(ax[1, 1])
+# plt.savefig('./graphs/Neurosynth_2_terms.png', dpi=600)
 # plt.show()
-#
+
+
 # # similarly, plot the other three terms
 # thought = nibabel.load('./Neurosynth/thought_association-test_z_FDR_0.01.nii.gz')
 # updating = nibabel.load('./Neurosynth/updating_association-test_z_FDR_0.01.nii.gz')
@@ -261,8 +263,9 @@ brain_plotting_left(fc_combined, 'brain loadings - combined', 0, 0.20, 'Reds')
 # plt.delaxes(ax[0, 1])
 # plt.delaxes(ax[1, 1])
 # plt.delaxes(ax[2, 1])
+# plt.savefig('./graphs/Neurosynth_3_terms.png', dpi=600)
 # plt.show()
-#
+
 # # do the same for the other two terms
 # adaptation = nibabel.load('./Neurosynth/adaptation_association-test_z_FDR_0.01.nii.gz')
 # belief = nibabel.load('./Neurosynth/belief_association-test_z_FDR_0.01.nii.gz')
