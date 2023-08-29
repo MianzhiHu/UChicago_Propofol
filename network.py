@@ -137,21 +137,21 @@ def find_network(file_path: str, hurst=None, condition: str = None):
     return posthoc
 
 
-# posthoc_all = find_network('./data_generated/nodes_with_hurst_values.npy', hurst, 'Narrative Listening')
+posthoc_all = find_network('./data_generated/nodes_with_hurst_values.npy', hurst, 'Narrative Listening + Propofol - H')
 # posthoc_mild = find_network('./data_generated/nodes_with_hurst_values_02.npy', hurst_movie_02, 'Mild Sedation')
 # posthoc_deep = find_network('./data_generated/nodes_with_hurst_values_03.npy', hurst_movie_03, 'Deep Sedation')
 # find_network('./data_generated/nodes_with_hurst_values_01_3.npy', hurst_movie_01_3, 'awake')
-# posthoc_rest = find_network('./data_generated/nodes_with_hurst_values_last_60_TR.npy', hurst_last_60_TR, 'Resting State')
-# posthoc_effect_of_movie = find_network('./data_generated/nodes_with_hurst_values_effect_of_movie.npy', hurst_effect_of_movie, 'Effect of Movie')
+posthoc_rest = find_network('./data_generated/nodes_with_hurst_values_last_60_TR.npy', hurst_last_60_TR, 'Propofol - H')
+posthoc_effect_of_movie = find_network('./data_generated/nodes_with_hurst_values_effect_of_movie.npy', hurst_effect_of_movie, 'Narrative Listening - H')
 
 
-# posthoc_fc_movie = find_network('./data_generated/nodes_with_fc_values.npy', fc_movie, 'Narrative Listening')
+posthoc_fc_movie = find_network('./data_generated/nodes_with_fc_values.npy', fc_movie, 'Narrative Listening + Propofol - FC')
 # posthoc_fc_rest = find_network('./data_generated/nodes_with_fc_values_rest.npy', fc_rest, 'Resting State')
 # posthoc_fc_movie_abs = find_network('./data_generated/nodes_with_fc_values_abs.npy', fc_movie_abs, 'Narrative Listening')
 # posthoc_fc_double_two_way = find_network('./data_generated/nodes_with_fc_values_double_two_way.npy', fc_double_two_way, 'Propofol + Narrative Listening')
-# posthoc_fc_rest_last_60_TR = find_network('./data_generated/nodes_with_fc_values_rest_last_60_TR.npy', fc_rest_last_60_TR, 'Resting State')
+posthoc_fc_rest_last_60_TR = find_network('./data_generated/nodes_with_fc_values_rest_last_60_TR.npy', fc_rest_last_60_TR, 'Propofol - FC')
 # posthoc_hurst_double_two_way = find_network('./data_generated/nodes_with_hurst_double_two_way.npy', hurst_double_two_way, 'Propofol + Narrative Listening')
-# posthoc_fc_effect_of_movie = find_network('./data_generated/nodes_with_fc_values_effect_of_movie.npy', fc_effect_of_movie, 'Effect of Movie - FC')
+posthoc_fc_effect_of_movie = find_network('./data_generated/nodes_with_fc_values_effect_of_movie.npy', fc_effect_of_movie, 'Narrative Listening - FC')
 
 # # plot the atlas
 # atlas = load_shen_268(1)

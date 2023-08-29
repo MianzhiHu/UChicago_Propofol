@@ -28,7 +28,7 @@ nodes = np.union1d(hurst_nodes_rest, fc_nodes_rest)
 # get the combination of the nodes
 edges_rest = [(nodes[i], nodes[j]) for i in range(len(nodes)) for j in range(i + 1, len(nodes))]
 
-with open('fc_dict.pickle', 'rb') as f:
+with open('./pickles/fc_dict.pickle', 'rb') as f:
     fc_dict = pickle.load(f)
 
     # for all the files in the dictionary, only keep the upper triangle
@@ -186,51 +186,6 @@ def record_missing_edges(df_1, df_2, df_3, df_4, df_5=None):
 # np.save('./data_generated/missing_edges_rest_post_hoc.npy', missing_edges_rest_post_hoc)
 # np.save('./data_generated/missing_edges_combined.npy', missing_edges_combined)
 
-# reset the index of new_df_edges_movie as edges
-new_df_edges_movie.index = edges
-new_df_edges_rest.index = edges
-new_df_edges_effect_of_movie.index = edges
-new_df_edges_rest_last_60_TR.index = edges
-new_df_edges_double_two_way.index = edges
-new_df_edges_rest_post_hoc.index = edges_rest
-new_df_edges_combined.index = edges
-
-# re-fit the new_df_edges_rest_post_hoc into the 35778 edges
-new_df_edges_rest_post_hoc = new_df_edges_rest_post_hoc.reindex(edges)
-
-
-new_df_edges_movie_list = new_df_edges_movie['u1'].tolist()
-new_df_edges_rest_list = new_df_edges_rest['u1'].tolist()
-new_df_edges_effect_of_movie_list = new_df_edges_effect_of_movie['u1'].tolist()
-new_df_edges_rest_last_60_TR_list = new_df_edges_rest_last_60_TR['u1'].tolist()
-new_df_edges_double_two_way_list = new_df_edges_double_two_way['u1'].tolist()
-new_df_edges_rest_post_hoc_list = new_df_edges_rest_post_hoc['u1'].tolist()
-new_df_edges_combined_list = new_df_edges_combined['u1'].tolist()
-
-nodes_edges_movie = [i for i, x in enumerate(new_df_edges_movie_list) if str(x) != 'nan']
-nodes_edges_rest = [i for i, x in enumerate(new_df_edges_rest_list) if str(x) != 'nan']
-nodes_edges_effect_of_movie = [i for i, x in enumerate(new_df_edges_effect_of_movie_list) if str(x) != 'nan']
-nodes_edges_rest_last_60_TR = [i for i, x in enumerate(new_df_edges_rest_last_60_TR_list) if str(x) != 'nan']
-nodes_edges_double_two_way = [i for i, x in enumerate(new_df_edges_double_two_way_list) if str(x) != 'nan']
-nodes_edges_rest_post_hoc = [i for i, x in enumerate(new_df_edges_rest_post_hoc_list) if str(x) != 'nan']
-nodes_edges_combined = [i for i, x in enumerate(new_df_edges_combined_list) if str(x) != 'nan']
-
-new_df_edges_movie = new_df_edges_movie['u1']
-new_df_edges_rest = new_df_edges_rest['u1']
-new_df_edges_effect_of_movie = new_df_edges_effect_of_movie['u1']
-new_df_edges_rest_last_60_TR = new_df_edges_rest_last_60_TR['u1']
-new_df_edges_double_two_way = new_df_edges_double_two_way['u1']
-new_df_edges_rest_post_hoc = new_df_edges_rest_post_hoc['u1']
-new_df_edges_combined = new_df_edges_combined['u1']
-
-new_df_edges_movie_clean = new_df_edges_movie.dropna(axis=0, how='any')
-new_df_edges_rest_clean = new_df_edges_rest.dropna(axis=0, how='any')
-new_df_edges_effect_of_movie_clean = new_df_edges_effect_of_movie.dropna(axis=0, how='any')
-new_df_edges_rest_last_60_TR_clean = new_df_edges_rest_last_60_TR.dropna(axis=0, how='any')
-new_df_edges_double_two_way_clean = new_df_edges_double_two_way.dropna(axis=0, how='any')
-new_df_edges_rest_post_hoc_clean = new_df_edges_rest_post_hoc.dropna(axis=0, how='any')
-new_df_edges_combined_clean = new_df_edges_combined.dropna(axis=0, how='any')
-
 
 def check_min_and_max(pd_series):
     min_value = pd_series.min()
@@ -280,17 +235,24 @@ def boxplot_the_mean(df_1, df_2, df_3, df_4, nodes_with_values):
 # boxplot_the_mean(edges_rest_awake_last_60_TR, edges_movie_deep, None, None, nodes_edges_double_two_way)
 # boxplot_the_mean(edges_rest_awake_post_hoc, edges_rest_mild_post_hoc, edges_rest_deep_post_hoc, edges_rest_recovery_post_hoc, nodes_edges_rest_post_hoc)
 
+
 # visualize the significant edges
 # load the shen 268 atlas
 atlas = load_shen_268(1)
 coordinates = plotting.find_parcellation_cut_coords(labels_img=atlas)
 
 
-def matrix_generator(df_edges):
+def matrix_generator(new_df_edges):
+    # reset the index of new_df_edges as edges
+    new_df_edges.index = edges
+    # # in case I need to identify the nodes with values, return this list
+    # new_df_edges_list = new_df_edges['u1'].tolist()
+    # nodes_edges = [i for i, x in enumerate(new_df_edges_list) if str(x) != 'nan']
+    new_df_edges = new_df_edges['u1']
     # create a matrix of zeros
     matrix = np.zeros((268, 268))
     # fill the matrix with the edges
-    matrix[np.triu_indices(268, 1)] = df_edges
+    matrix[np.triu_indices(268, 1)] = new_df_edges
     matrix += np.triu(matrix, 1).T
     # fill all the nan values with 0
     matrix[np.isnan(matrix)] = 0
@@ -309,7 +271,8 @@ def matrix_generator(df_edges):
 # plt.savefig('./graphs/edges_movie_plot.png', dpi=650)
 # plt.show()
 
-# plotting.plot_connectome(matrix_generator(new_df_edges_rest), coordinates, colorbar=True, node_size=0, edge_threshold=0.020)
+# plotting.plot_connectome(matrix_generator(new_df_edges_rest), coordinates, colorbar=True, node_size=0, edge_threshold="99.8%")
+# plt.savefig('./graphs/edges_effect_of_propofol_plot.png', dpi=650)
 # plt.show()
 
 # plotting.plot_connectome(matrix_generator(new_df_edges_effect_of_movie), coordinates, colorbar=True, node_size=0, edge_threshold="99.8%")
@@ -330,5 +293,4 @@ def matrix_generator(df_edges):
 # plt.savefig('./graphs/edges_combined_effects_plot.png', dpi=650)
 # plt.show()
 
-# a = matrix_generator(new_df_edges_rest_post_hoc)
 
