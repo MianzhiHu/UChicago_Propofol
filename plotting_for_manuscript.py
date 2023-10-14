@@ -40,35 +40,35 @@ def side_by_side_plot_generator(img1, img2, figure_length, figure_width, title, 
     plt.show()
 
 
-# side_by_side_plot_generator(img1=plt.imread('./graphs/brain loadings - fc.png'),
-#                             img2=plt.imread('./graphs/brain loadings - fc_left.png'),
-#                             figure_length=5,
-#                             figure_width=3,
-#                             title1='Right Hemisphere',
-#                             title2='Left Hemisphere',
-#                             title='FC_Movie_brain',
-#                             orientation='horizontal',
-#                             dpi=650)
+side_by_side_plot_generator(img1=plt.imread('./graphs/Combined Effects - FC.png'),
+                            img2=plt.imread('./graphs/Combined Effects - FC_left.png'),
+                            figure_length=5,
+                            figure_width=3,
+                            title1='Right Hemisphere',
+                            title2='Left Hemisphere',
+                            title='Combined Effects - FC',
+                            orientation='horizontal',
+                            dpi=650)
 
-side_by_side_plot_generator(img1=plt.imread('./graphs/PLS summary.png'),
-                            img2=plt.imread('./graphs/edges_effect_of_propofol_plot.png'),
+side_by_side_plot_generator(img1=plt.imread('./graphs/edges_combined.png'),
+                            img2=plt.imread('./graphs/edges_combined_effects_plot.png'),
                             figure_length=3,
                             figure_width=5,
-                            # title1='(a) Effect of Propofol - Edges',
-                            title2='(c) Significant Edges With Full Data',
-                            title='PLS summary',
+                            title1='(a) Combined Effects (5-condition) PLS - Edges',
+                            title2='(b) Significant Edges in PLS - Combined Effects',
+                            title='Combined Effects - Edges',
                             orientation='vertical',
-                            dpi=600)
+                            dpi=650)
 
-# side_by_side_plot_generator(img1=plt.imread('./graphs/PLS_neurosynth_hurst.png'),
-#                             img2=plt.imread('./graphs/Neurosynth_2_terms.png'),
-#                             figure_length=5,
-#                             figure_width=3,
-#                             title1='(a) Combined Effects - Neurosynth',
-#                             title2='(b) Neurosynth Templates',
-#                             title='Combined Effects - Neurosynth',
-#                             orientation='horizontal',
-#                             dpi=600)
+side_by_side_plot_generator(img1=plt.imread('./graphs/PLS_neurosynth_hurst.png'),
+                            img2=plt.imread('./graphs/Neurosynth_2_terms.png'),
+                            figure_length=5,
+                            figure_width=3,
+                            title1='(c) Decoupled Effects PLS - Neurosynth',
+                            title2='(d) Neurosynth Templates',
+                            title='Combined Effects - Neurosynth',
+                            orientation='horizontal',
+                            dpi=600)
 
 
 def four_consecutive_plot_generator(img1, img2, img3, img4, figure_length, figure_width,
@@ -113,66 +113,158 @@ def four_consecutive_plot_generator(img1, img2, img3, img4, figure_length, figur
     plt.show()
 
 
-# four_consecutive_plot_generator(img1=plt.imread('./graphs/pls_movie.png'),
-#                                 img2=plt.imread('./graphs/Hurst_Movie.png'),
-#                                 img3=plt.imread('./graphs/FC_Movie.png'),
-#                                 img4=plt.imread('./graphs/FC_Movie_brain.png'),
-#                                 figure_length=15,
-#                                 figure_width=30,
-#                                 title1='(a) Combined Effects PLS - Hurst',
-#                                 title2='(b) Significant Brain Nodes in PLS - Hurst',
-#                                 title3='(c) Combined Effects PLS - General FC',
-#                                 title4='(d) Significant Brain Nodes in PLS - General FC',
-#                                 title='Combined Effects',
-#                                 orientation='vertical',
-#                                 dpi=650)
+four_consecutive_plot_generator(img1=plt.imread('./graphs/FC_Movie.png'),
+                                img2=plt.imread('./graphs/FC_Movie_brain.png'),
+                                img3=plt.imread('./graphs/edges_movie_abs.png'),
+                                img4=plt.imread('./graphs/edges_movie_plot.png'),
+                                figure_length=15,
+                                figure_width=30,
+                                title1='(a) Combined Effects Decoupled PLS - General FC',
+                                title2='(b) Significant Brain Nodes in PLS - General FC',
+                                title3='(c) Combined Effects Decoupled PLS - Edges',
+                                title4='(d) Significant Brain Nodes in PLS - Edges',
+                                title='Combined Effects - Supplementary',
+                                orientation='vertical',
+                                dpi=650)
 
-hurst_averages = pd.read_csv('./data_generated/hurst_averages.csv')
-n, bins, patches = plt.hist(hurst_averages['r_squared'], bins=30, density=True)
-density = gaussian_kde(hurst_averages['r_squared'])
-x = np.linspace(min(bins), max(bins), 1000)
-plt.plot(x, density(x), color='red')
-# reverse the x-axis
-plt.gca().invert_xaxis()
-# make the y-axis only contain integers
-plt.yticks(np.arange(0, 20, 5))
-plt.title('R-Squared Distribution - DFA')
-plt.xlabel('R-Squared')
-plt.ylabel('Freuency')
-plt.show()
+# # plot the histogram of r-squared
+# hurst_averages = pd.read_csv('./data_generated/hurst_averages.csv')
+# n, bins, patches = plt.hist(hurst_averages['r_squared'], bins=30, density=True)
+# density = gaussian_kde(hurst_averages['r_squared'])
+# x = np.linspace(min(bins), max(bins), 1000)
+# plt.plot(x, density(x), color='red')
+# # reverse the x-axis
+# plt.gca().invert_xaxis()
+# # make the y-axis only contain integers
+# plt.yticks(np.arange(0, 20, 5))
+# plt.title('R-Squared Distribution - DFA')
+# plt.xlabel('R-Squared')
+# plt.ylabel('Frequency')
+# plt.show()
 
-
-movie_propofol_h = plt.imread('./graphs/brain_loading_Narrative Listening + Propofol - H.png')
-movie_propofol_fc = plt.imread('./graphs/brain_loading_Narrative Listening + Propofol - FC.png')
-movie_h = plt.imread('./graphs/brain_loading_Narrative Listening - H.png')
-movie_fc = plt.imread('./graphs/brain_loading_Narrative Listening - FC.png')
-propofol_h = plt.imread('./graphs/brain_loading_Propofol - H.png')
-propofol_fc = plt.imread('./graphs/brain_loading_Propofol - FC.png')
-
-fig, ax = plt.subplots(3, 2, figsize=(30, 20), constrained_layout=True)
+# create a three consecutive plot
+fig, ax = plt.subplots(3, 1, figsize=(20, 30), constrained_layout=True)
 for i in range(3):
-    for j in range(2):
-        ax[i][j].set_xticks([])
-        ax[i][j].set_yticks([])
-        ax[i][j].spines['top'].set_linewidth(0)
-        ax[i][j].spines['bottom'].set_linewidth(0)
-        ax[i][j].spines['left'].set_linewidth(0)
-        ax[i][j].spines['right'].set_linewidth(0)
-ax[0][0].imshow(movie_propofol_h)
-ax[1][0].imshow(movie_h)
-ax[2][0].imshow(propofol_h)
-ax[0][1].imshow(movie_propofol_fc)
-ax[1][1].imshow(movie_fc)
-ax[2][1].imshow(propofol_fc)
+    ax[i].set_xticks([])
+    ax[i].set_yticks([])
+    ax[i].spines['top'].set_linewidth(0)
+    ax[i].spines['bottom'].set_linewidth(0)
+    ax[i].spines['left'].set_linewidth(0)
+    ax[i].spines['right'].set_linewidth(0)
+ax[0].imshow(plt.imread('./graphs/pls_movie.png'))
+ax[0].set_title('(a) Combined Effects Decoupled - Hurst', fontsize=30)
+ax[1].imshow(plt.imread('./graphs/Hurst_Movie.png'))
+ax[1].set_title('(b) Significant Brain Nodes in PLS - Hurst', fontsize=30)
+ax[2].imshow(plt.imread('./graphs/Combined Effects - Neurosynth.png'))
 # set position
-ax[0][0].set_position([0, 0.66, 0.5, 0.33])
-ax[1][0].set_position([0, 0.33, 0.5, 0.33])
-ax[2][0].set_position([0, 0, 0.5, 0.33])
-ax[0][1].set_position([0.5, 0.66, 0.5, 0.33])
-ax[1][1].set_position([0.5, 0.33, 0.5, 0.33])
-ax[2][1].set_position([0.5, 0, 0.5, 0.33])
-plt.savefig('./graphs/network_summary.png', dpi=2100)
+ax[0].set_position([0, 0.64, 1, 0.33])
+ax[1].set_position([0, 0.33, 1, 0.30])
+ax[2].set_position([0, 0, 1, 0.36])
+plt.savefig('./graphs/Combined Effects Decoupled', dpi=650)
 plt.show()
+
+# create a five consecutive plot
+fig, ax = plt.subplots(5, 1, figsize=(20, 45), constrained_layout=True)
+for i in range(5):
+    ax[i].set_xticks([])
+    ax[i].set_yticks([])
+    ax[i].spines['top'].set_linewidth(0)
+    ax[i].spines['bottom'].set_linewidth(0)
+    ax[i].spines['left'].set_linewidth(0)
+    ax[i].spines['right'].set_linewidth(0)
+ax[0].imshow(plt.imread('./graphs/hurst_combined.png'))
+ax[0].set_title('(a) Combined Effects (5-condition) PLS - Hurst', fontsize=30)
+ax[1].imshow(plt.imread('./graphs/average_hurst_combined.png'))
+ax[1].set_title('(b) Average H for Significant Brain Nodes in PLS', fontsize=30)
+ax[2].imshow(plt.imread('./graphs/Combined Effects - Hurst.png'))
+ax[2].set_title('(c) Significant Brain Nodes in PLS - Hurst', fontsize=30)
+ax[3].imshow(plt.imread('./graphs/fc_combined.png'))
+ax[3].set_title('(d) Combined Effects PLS (5-condition) - General FC', fontsize=30)
+ax[4].imshow(plt.imread('./graphs/Combined Effects - FC.png'))
+ax[4].set_title('(e) Significant Brain Nodes in PLS - General FC', fontsize=30)
+# set position
+ax[0].set_position([0, 0.79, 1, 0.19])
+ax[1].set_position([0, 0.58, 1, 0.19])
+ax[2].set_position([0, 0.38, 1, 0.18])
+ax[3].set_position([0, 0.19, 1, 0.19])
+ax[4].set_position([0, 0, 1, 0.18])
+# plt.savefig('./graphs/Combined Effects - 5', dpi=650)
+plt.show()
+#
+# # network summary
+# movie_propofol_h = plt.imread('./graphs/brain_loading_Narrative Listening + Propofol - H.png')
+# movie_propofol_fc = plt.imread('./graphs/brain_loading_Narrative Listening + Propofol - FC.png')
+# movie_h = plt.imread('./graphs/brain_loading_Narrative Listening - H.png')
+# movie_fc = plt.imread('./graphs/brain_loading_Narrative Listening - FC.png')
+# propofol_h = plt.imread('./graphs/brain_loading_Propofol - H.png')
+# propofol_fc = plt.imread('./graphs/brain_loading_Propofol - FC.png')
+#
+# fig, ax = plt.subplots(3, 2, figsize=(30, 20), constrained_layout=True)
+# for i in range(3):
+#     for j in range(2):
+#         ax[i][j].set_xticks([])
+#         ax[i][j].set_yticks([])
+#         ax[i][j].spines['top'].set_linewidth(0)
+#         ax[i][j].spines['bottom'].set_linewidth(0)
+#         ax[i][j].spines['left'].set_linewidth(0)
+#         ax[i][j].spines['right'].set_linewidth(0)
+# ax[0][0].imshow(movie_propofol_h)
+# ax[1][0].imshow(movie_h)
+# ax[2][0].imshow(propofol_h)
+# ax[0][1].imshow(movie_propofol_fc)
+# ax[1][1].imshow(movie_fc)
+# ax[2][1].imshow(propofol_fc)
+# # set position
+# ax[0][0].set_position([0, 0.66, 0.5, 0.33])
+# ax[1][0].set_position([0, 0.33, 0.5, 0.33])
+# ax[2][0].set_position([0, 0, 0.5, 0.33])
+# ax[0][1].set_position([0.5, 0.66, 0.5, 0.33])
+# ax[1][1].set_position([0.5, 0.33, 0.5, 0.33])
+# ax[2][1].set_position([0.5, 0, 0.5, 0.33])
+# plt.savefig('./graphs/network_summary.png', dpi=2100)
+# plt.show()
+
+# # make a huge plot
+# fig, ax = plt.subplots(4, 2, figsize=(20, 30), constrained_layout=True)
+# for i in range(4):
+#     for j in range(2):
+#         ax[i][j].set_xticks([])
+#         ax[i][j].set_yticks([])
+#         ax[i][j].spines['top'].set_linewidth(0)
+#         ax[i][j].spines['bottom'].set_linewidth(0)
+#         ax[i][j].spines['left'].set_linewidth(0)
+#         ax[i][j].spines['right'].set_linewidth(0)
+#         ax[i][j].title.set_fontsize(20)
+# ax[0][0].imshow(plt.imread('./graphs/hurst_effect_of_movie.png'))
+# ax[0][0].set_title('(a) Effect of Narrative Listening PLS - Hurst')
+# ax[1][0].imshow(plt.imread('./graphs/Effect of Narrative Listening - Hurst.png'))
+# ax[1][0].set_title('(b) Significant Brain Nodes for Narrative Listening - Hurst')
+# ax[2][0].imshow(plt.imread('./graphs/fc_effect_of_movie.png'))
+# ax[2][0].set_title('(c) Effect of Narrative Listening PLS - General FC')
+# ax[3][0].imshow(plt.imread('./graphs/Effect of Narrative Listening - FC.png'))
+# ax[3][0].set_title('(d) Significant Brain Nodes for Narrative Listening - General FC')
+# ax[0][1].imshow(plt.imread('./graphs/rest_last.png'))
+# ax[0][1].set_title('(e) Effect of Propofol PLS - Hurst')
+# ax[1][1].imshow(plt.imread('./graphs/Effect of Propofol - Hurst.png'))
+# ax[1][1].set_title('(f) Significant Brain Nodes for Propofol - Hurst')
+# ax[2][1].imshow(plt.imread('./graphs/fc_rest_60.png'))
+# ax[2][1].set_title('(g) Effect of Propofol PLS - General FC')
+# ax[3][1].imshow(plt.imread('./graphs/Effect of Propofol - FC.png'))
+# ax[3][1].set_title('(h) Significant Brain Nodes for Propofol - General FC')
+# # set position
+# ax[0][0].set_position([0, 0.75, 0.5, 0.25])
+# ax[1][0].set_position([0, 0.5, 0.5, 0.25])
+# ax[2][0].set_position([0, 0.25, 0.5, 0.25])
+# ax[3][0].set_position([0, 0, 0.5, 0.25])
+# ax[0][1].set_position([0.5, 0.75, 0.5, 0.25])
+# ax[1][1].set_position([0.5, 0.5, 0.5, 0.25])
+# ax[2][1].set_position([0.5, 0.25, 0.5, 0.25])
+# ax[3][1].set_position([0.5, 0, 0.5, 0.25])
+# plt.savefig('./graphs/individual_effects.png', dpi=2100)
+# plt.show()
+#
+#
+
 
 
 

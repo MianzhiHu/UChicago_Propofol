@@ -46,7 +46,7 @@ import statsmodels.api as sm
 # print('done')
 
 def scatter_plot():
-    with open('fc_dict.pickle', 'rb') as f:
+    with open('./pickles/fc_dict.pickle', 'rb') as f:
         fc_dict = pickle.load(f)
         # remove the rest condition
         fc_dict = {key: value for key, value in fc_dict.items() if 'rest' not in key}
@@ -56,7 +56,7 @@ def scatter_plot():
             fc_dict[key] = value_mean
         df = pd.DataFrame.from_dict(fc_dict, orient='index')
 
-    with open('fc_dict_last_60_TR.pickle', 'rb') as g:
+    with open('./pickles/fc_dict_last_60_TR.pickle', 'rb') as g:
         fc_dict_last_60_TR = pickle.load(g)
         # keep the rest condition
         fc_dict_last_60_TR = {key: value for key, value in fc_dict_last_60_TR.items() if 'rest' in key}
@@ -72,7 +72,7 @@ def scatter_plot():
     # take the row means and remove all the columns
     df_fc = df_fc.mean(axis=1)
 
-    with open('outcome_268.pickle', 'rb') as h:
+    with open('./pickles/outcome_268.pickle', 'rb') as h:
         hurst_dict = pickle.load(h)
         hurst_dict = {key: value for key, value in hurst_dict.items() if 'rest' not in key}
         for key, value in hurst_dict.items():
@@ -147,7 +147,7 @@ def scatter_plot():
 # print(model.summary())
 
 
-def fc_analysis(subset_keys=None, pickle_file='fc_dict.pickle'):
+def fc_analysis(subset_keys=None, pickle_file='./pickles/fc_dict.pickle'):
     with open(pickle_file, 'rb') as f:
         fc_dict = pickle.load(f)
 
@@ -199,13 +199,13 @@ fc_all_nan_1, fc_movie = fc_analysis(subset_keys='movie')
 fc_all_nan_2, fc_rest = fc_analysis(subset_keys='rest')
 
 fc_rest_nan_last_60_TR_1, fc_rest_awake_last_60_TR = fc_analysis(subset_keys='rest_01_LPI',
-                                                                 pickle_file='fc_dict_last_60_TR.pickle')
+                                                                 pickle_file='./pickles/fc_dict_last_60_TR.pickle')
 fc_rest_nan_last_60_TR_2, fc_rest_mild_last_60_TR = fc_analysis(subset_keys='rest_02_LPI',
-                                                                pickle_file='fc_dict_last_60_TR.pickle')
+                                                                pickle_file='./pickles/fc_dict_last_60_TR.pickle')
 fc_rest_nan_last_60_TR_3, fc_rest_deep_last_60_TR = fc_analysis(subset_keys='rest_03_LPI',
-                                                                pickle_file='fc_dict_last_60_TR.pickle')
+                                                                pickle_file='./pickles/fc_dict_last_60_TR.pickle')
 fc_rest_nan_last_60_TR_4, fc_rest_recovery_last_60_TR = fc_analysis(subset_keys='rest_04_LPI',
-                                                                    pickle_file='fc_dict_last_60_TR.pickle')
+                                                                    pickle_file='./pickles/fc_dict_last_60_TR.pickle')
 
 # # combine the nan columns
 # fc_movie_nan = list(set(fc_movie_nan_1 + fc_movie_nan_2 + fc_movie_nan_3 + fc_movie_nan_4))

@@ -11,7 +11,6 @@ from scipy.stats import stats, tukey_hsd, hypergeom
 from atlasTransform.atlasTransform.utils.atlas import load_shen_268
 from brain_plotting import hurst, hurst_movie_03, hurst_movie_02, hurst_movie_01_3, fc_movie, fc_rest, fc_movie_abs, \
     hurst_last_60_TR, fc_double_two_way, fc_rest_last_60_TR, hurst_double_two_way, hurst_effect_of_movie, fc_effect_of_movie
-
 import scikit_posthocs as sp
 from statsmodels.stats.multitest import multipletests
 
@@ -23,6 +22,7 @@ def find_network(file_path: str, hurst=None, condition: str = None):
     network_label_filtered = network_label[network_label['Node'].isin(node_numbers+1)]
     network_name = pd.read_csv('./atlasTransform/atlasTransform/data/shen_268/network_descriptions.csv')
     network_label_filtered['Network'] = network_label_filtered['Network'].map(network_name.set_index('Network')['name'])
+    print(network_label_filtered)
     # count the number of nodes in each network
     value_count = network_label_filtered['Network'].value_counts()
 
@@ -30,11 +30,6 @@ def find_network(file_path: str, hurst=None, condition: str = None):
     p_values = {}
     # iterate through each network
     for network in value_count.index:
-        # calculate the denominator for the hypergeometric test
-        denominator = len(network_label_filtered[network_label_filtered['Network'] == network])
-        if denominator == 0:
-            # skip the calculation if the denominator is zero
-            denominator = 1
         # calculate the p-value for the hypergeometric test
         p = hypergeom.sf(value_count[network] - 1, len(network_label_filtered),
                          len(network_label_filtered) - value_count[network], value_count[network])

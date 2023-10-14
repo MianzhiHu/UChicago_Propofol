@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+
 # with open('outcome_268.pickle', 'rb') as f:
 #     results_dict = pickle.load(f)
 #     counter = 0
@@ -39,6 +40,7 @@ def pls_csv(pickle_name: str):
         hurst_df.to_csv(f'pls_{pickle_name}.csv', index=False, header=False)
         print(f'pls_{pickle_name} saved to disk')
 
+
 # pls_csv('rest.pickle')
 
 
@@ -58,36 +60,48 @@ recovery_1 = pd.read_csv('./data_generated/pls_rest_recovery.csv', header=None)
 # awake_clean = awake.drop(columns=effect_of_movie_missing)
 # print(awake_clean.shape)
 
-# # load the column numbers that need to be kept
-# nodes = np.load('./data_generated/nodes_with_hurst_values.npy', allow_pickle=True)
-# nodes = nodes.tolist()
-#
-# # keep only the columns that are in the nodes list
-# awake_pls_nodes = awake[nodes]
-# mild_pls_nodes = mild[nodes]
-# deep_pls_nodes = deep[nodes]
-# recovery_pls_nodes = recovery[nodes]
-#
-# # take the mean value of each row
-# awake_pls_nodes_mean = awake_pls_nodes.mean(axis=1)
-# mild_pls_nodes_mean = mild_pls_nodes.mean(axis=1)
-# deep_pls_nodes_mean = deep_pls_nodes.mean(axis=1)
-# recovery_pls_nodes_mean = recovery_pls_nodes.mean(axis=1)
+# load the column numbers that need to be kept
+nodes = np.load('./data_generated/nodes_with_hurst_combined.npy', allow_pickle=True)
+nodes = nodes.tolist()
 
-# # take the mean value of each column
-# awake_pls_nodes_mean = awake_pls_nodes_mean.mean()
-# mild_pls_nodes_mean = mild_pls_nodes_mean.mean()
-# deep_pls_nodes_mean = deep_pls_nodes_mean.mean()
-# recovery_pls_nodes_mean = recovery_pls_nodes_mean.mean()
+# keep only the columns that are in the nodes list
+rest_awake_pls_nodes = rest_awake[nodes]
+awake_pls_nodes = awake[nodes]
+mild_pls_nodes = mild[nodes]
+deep_pls_nodes = deep[nodes]
+recovery_pls_nodes = recovery[nodes]
+
+# take the mean value of each row
+rest_awake_pls_nodes_mean = rest_awake_pls_nodes.mean(axis=1)
+awake_pls_nodes_mean = awake_pls_nodes.mean(axis=1)
+mild_pls_nodes_mean = mild_pls_nodes.mean(axis=1)
+deep_pls_nodes_mean = deep_pls_nodes.mean(axis=1)
+recovery_pls_nodes_mean = recovery_pls_nodes.mean(axis=1)
+
+# take the mean value of each column
+mean = [rest_awake_pls_nodes_mean.mean(), awake_pls_nodes_mean.mean(),
+        mild_pls_nodes_mean.mean(), deep_pls_nodes_mean.mean(), recovery_pls_nodes_mean.mean()]
 
 
-# # plot a boxplot
-# plt.boxplot([awake_pls_nodes_mean, mild_pls_nodes_mean, deep_pls_nodes_mean, recovery_pls_nodes_mean])
-# plt.xticks([1, 2, 3, 4], ['awake', 'mild', 'deep', 'recovery'])
-# plt.ylabel('Hurst Exponent')
-# plt.savefig('./graphs/ave_hurst_movie.png', dpi=300)
-# # set the size of the figure
-# plt.figure(figsize=(10, 30))
+def standard_error(data):
+    return np.std(data) / np.sqrt(len(data))
+
+
+se = [standard_error(rest_awake_pls_nodes_mean), standard_error(awake_pls_nodes_mean),
+      standard_error(mild_pls_nodes_mean), standard_error(deep_pls_nodes_mean),
+      standard_error(recovery_pls_nodes_mean)]
+
+# # plot a bar chart
+# labels = ['rest awake', 'movie awake', 'movie mild', 'movie deep', 'movie Recovery']
+# x = np.arange(len(labels))
+# width = 0.8
+# fig, ax = plt.subplots(figsize=(10, 10))
+# rects1 = ax.bar(x, mean, width, yerr=se, capsize=5)
+# ax.set_ylabel('Average Hurst value')
+# ax.set_ylim(0.5, 0.8)
+# ax.set_xticks(x)
+# ax.set_xticklabels(labels, rotation=45)
+# plt.savefig('./graphs/average_hurst_combined.png', dpi=600)
 # plt.show()
 
 movie_03_early = pd.read_csv('./data_generated/pls_movie_03_early.csv', header=None)
@@ -193,6 +207,8 @@ df_01 = pd.concat([movie_01_early, movie_01_mid, movie_01_late], axis=0)
 # print(movie_01_early.shape, movie_01_mid.shape, movie_01_late.shape)
 
 df_everything = pd.concat([awake, mild, deep, recovery, awake_1, mild_1, deep_1, recovery_1], axis=0)
+
+
 # print(df_everything)
 # print(awake.shape, mild.shape, deep.shape, recovery.shape, awake_1.shape, mild_1.shape, deep_1.shape, recovery_1.shape)
 
@@ -204,6 +220,7 @@ def find_missing_values(df):
             # print(column)
             nodes_with_missing_values.append(column)
     return nodes_with_missing_values
+
 
 df_movie_missing = find_missing_values(df_movie)
 df_03_missing = find_missing_values(df_03)
@@ -353,13 +370,3 @@ df_03_30 = df_03_30.dropna(axis=1)
 # rest_clean.to_csv('pls_rest_clean.csv', index=False, header=False)
 
 print('Partial_Least_Squares has been read')
-
-
-
-
-
-
-
-
-
-

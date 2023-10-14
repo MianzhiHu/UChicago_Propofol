@@ -45,7 +45,7 @@ fc_combined = new_df_fc_combined.iloc[:, 0].tolist()
 # nodes_with_hurst_values_02 = [i for i, x in enumerate(hurst_movie_02) if str(x) != 'nan']
 # nodes_with_hurst_values_01_3 = [i for i, x in enumerate(hurst_movie_01_3) if str(x) != 'nan']
 # nodes_with_hurst_values_everything = [i for i, x in enumerate(hurst_everything) if str(x) != 'nan']
-nodes_with_hurst_values_last_60_TR = [i for i, x in enumerate(hurst_last_60_TR) if str(x) != 'nan']
+# nodes_with_hurst_values_last_60_TR = [i for i, x in enumerate(hurst_last_60_TR) if str(x) != 'nan']
 # nodes_with_hurst_values_effect_of_movie = [i for i, x in enumerate(hurst_effect_of_movie) if str(x) != 'nan']
 # nodes_with_hurst_double_three_way = [i for i, x in enumerate(hurst_double_three_way) if str(x) != 'nan']
 # nodes_with_hurst_double_two_way = [i for i, x in enumerate(hurst_double_two_way) if str(x) != 'nan']
@@ -65,7 +65,7 @@ nodes_with_hurst_values_last_60_TR = [i for i, x in enumerate(hurst_last_60_TR) 
 # np.save('./data_generated/nodes_with_hurst_values_03.npy', nodes_with_hurst_values_03)
 # np.save('./data_generated/nodes_with_hurst_values_02.npy', nodes_with_hurst_values_02)
 # np.save('./data_generated/nodes_with_hurst_values_01_3.npy', nodes_with_hurst_values_01_3)
-np.save('./data_generated/nodes_with_hurst_values_last_60_TR.npy', nodes_with_hurst_values_last_60_TR)
+# np.save('./data_generated/nodes_with_hurst_values_last_60_TR.npy', nodes_with_hurst_values_last_60_TR)
 # np.save('./data_generated/nodes_with_fc_values.npy', nodes_with_fc_values)
 # np.save('./data_generated/nodes_with_fc_values_rest.npy', nodes_with_fc_values_rest)
 # np.save('./data_generated/nodes_with_fc_values_abs.npy', nodes_with_fc_values_abs)
@@ -161,12 +161,12 @@ def brain_plotting (df, title, vmin, vmax, cmap, nodes_with_missing_values=None)
 # brain_plotting(fc_double_two_way, 'brain loadings - fc', 0, 0.2, 'Blues')
 # brain_plotting(fc_double_merged, 'brain loadings - fc', 0, 0.2, 'Blues')
 # brain_plotting(hurst_last_60_TR, 'Effect of Propofol - Hurst', 0, 0.16, 'Blues')
-# brain_plotting(hurst_effect_of_movie, 'Effect of Narrative Listening - Hurst', vmin=0, vmax=0.15, cmap='Blues')
+# # brain_plotting(hurst_effect_of_movie, 'Effect of Narrative Listening - Hurst', vmin=0, vmax=0.15, cmap='Blues')
 # brain_plotting(hurst_double_three_way, 'brain loadings - double three way', 0, 0.2, 'Blues')
 # brain_plotting(hurst_double_two_way, 'brain loadings - double two way', 0, 0.2, 'Blues')
 # brain_plotting(hurst_double_merged, 'brain loadings - double merged', 0, 0.2, 'Blues')
-# brain_plotting(hurst_combined, 'Combined Effects - Hurst', 0, 0.15, 'Reds')
-# brain_plotting(fc_combined, 'Combined Effects - FC', 0, 0.20, 'Reds')
+# brain_plotting(hurst_combined, 'Combined Effects - Hurst', 0, 0.15, 'Blues')
+# brain_plotting(fc_combined, 'Combined Effects - FC', 0, 0.20, 'Blues')
 
 
 def brain_plotting_left (df, title, vmin, vmax, cmap, nodes_with_missing_values=None):
@@ -215,8 +215,8 @@ def brain_plotting_left (df, title, vmin, vmax, cmap, nodes_with_missing_values=
 # brain_plotting_left(hurst_double_three_way, 'brain loadings - double three way', 0, 0.2, 'Blues')
 # brain_plotting_left(hurst_double_two_way, 'brain loadings - double two way', 0, 0.2, 'Blues')
 # brain_plotting_left(hurst_double_merged, 'brain loadings - double merged', 0, 0.2, 'Blues')
-# brain_plotting_left(hurst_combined, 'Combined Effects - Hurst', 0, 0.15, 'Reds')
-# brain_plotting_left(fc_combined, 'Combined Effects - FC', 0, 0.20, 'Reds')
+# brain_plotting_left(hurst_combined, 'Combined Effects - Hurst', 0, 0.15, 'Blues')
+# brain_plotting_left(fc_combined, 'Combined Effects - FC', 0, 0.20, 'Blues')
 
 # # plot using nilearn
 # visual_attention = nibabel.load('./Neurosynth/visual perception_association-test_z_FDR_0.01.nii.gz')

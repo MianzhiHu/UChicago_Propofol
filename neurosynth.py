@@ -71,7 +71,7 @@ def neurosynth_hurst(file_path, kept_terms_maps, term_surrogates, p_value, df_mo
     pvals = np.hstack([max(x, 1/n) for x in pvals])
     pvals[np.isnan(og_term_corrs)] = 1.
 
-    discoveries = multipletests(pvals,method='fdr_bh', alpha=p_value)[0]
+    discoveries = multipletests(pvals, method='fdr_bh', alpha=p_value)[0]
     discovery_terms = kept_terms[discoveries]
     discovery_corrs = og_term_corrs[discoveries]
     order = np.argsort(discovery_corrs)
