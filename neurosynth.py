@@ -78,6 +78,13 @@ def neurosynth_hurst(file_path, kept_terms_maps, term_surrogates, p_value, df_mo
     discovery_terms = discovery_terms[order]
     discovery_corrs = discovery_corrs[order]
 
+    # Calculate the standard error of the correlation
+    standard_error = np.sqrt((1 - np.square(og_term_corrs)) / (len(hurst) - 2))
+    standard_error = standard_error[discoveries]
+    standard_error = standard_error[order]
+    print(standard_error)
+
+
     plt.clf()
     plt.figure(figsize=(7, 5))
     ax = plt.subplot(1, 2, 2)
@@ -87,7 +94,7 @@ def neurosynth_hurst(file_path, kept_terms_maps, term_surrogates, p_value, df_mo
     plt.style.use('default')
     ax.tick_params(axis='x', length=0)
     plt.xticks(rotation=60, ha='right')
-    plt.bar(range(len(discovery_corrs)), discovery_corrs, tick_label=discovery_terms)
+    plt.bar(range(len(discovery_corrs)), discovery_corrs, tick_label=discovery_terms, yerr=standard_error[order], color='red')
     plt.ylabel('correlation with PLS loadings')
     plt.text(-.2, .62, r'$p_{null} < .01$', size=13)
     ax.set_ylim(-.65, .7)

@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 from scipy.stats import gaussian_kde
+import turtle
 
 
 def side_by_side_plot_generator(img1, img2, figure_length, figure_width, title, orientation, title1=None, title2=None, loc1=None,
@@ -40,35 +41,35 @@ def side_by_side_plot_generator(img1, img2, figure_length, figure_width, title, 
     plt.show()
 
 
-side_by_side_plot_generator(img1=plt.imread('./graphs/Combined Effects - FC.png'),
-                            img2=plt.imread('./graphs/Combined Effects - FC_left.png'),
-                            figure_length=5,
-                            figure_width=3,
-                            title1='Right Hemisphere',
-                            title2='Left Hemisphere',
-                            title='Combined Effects - FC',
-                            orientation='horizontal',
-                            dpi=650)
-
-side_by_side_plot_generator(img1=plt.imread('./graphs/edges_combined.png'),
-                            img2=plt.imread('./graphs/edges_combined_effects_plot.png'),
-                            figure_length=3,
-                            figure_width=5,
-                            title1='(a) Combined Effects (5-condition) PLS - Edges',
-                            title2='(b) Significant Edges in PLS - Combined Effects',
-                            title='Combined Effects - Edges',
-                            orientation='vertical',
-                            dpi=650)
-
-side_by_side_plot_generator(img1=plt.imread('./graphs/PLS_neurosynth_hurst.png'),
-                            img2=plt.imread('./graphs/Neurosynth_2_terms.png'),
-                            figure_length=5,
-                            figure_width=3,
-                            title1='(c) Decoupled Effects PLS - Neurosynth',
-                            title2='(d) Neurosynth Templates',
-                            title='Combined Effects - Neurosynth',
-                            orientation='horizontal',
-                            dpi=600)
+# side_by_side_plot_generator(img1=plt.imread('./graphs/Combined Effects - FC.png'),
+#                             img2=plt.imread('./graphs/Combined Effects - FC_left.png'),
+#                             figure_length=5,
+#                             figure_width=3,
+#                             title1='Right Hemisphere',
+#                             title2='Left Hemisphere',
+#                             title='Combined Effects - FC',
+#                             orientation='horizontal',
+#                             dpi=650)
+#
+# side_by_side_plot_generator(img1=plt.imread('./graphs/edges_combined.png'),
+#                             img2=plt.imread('./graphs/edges_combined_effects_plot.png'),
+#                             figure_length=3,
+#                             figure_width=5,
+#                             title1='(a) Combined Effects (5-condition) PLS - Edges',
+#                             title2='(b) Significant Edges in PLS - Combined Effects',
+#                             title='Combined Effects - Edges',
+#                             orientation='vertical',
+#                             dpi=650)
+#
+# side_by_side_plot_generator(img1=plt.imread('./graphs/PLS_neurosynth_hurst.png'),
+#                             img2=plt.imread('./graphs/Neurosynth_2_terms.png'),
+#                             figure_length=5,
+#                             figure_width=3,
+#                             title1='(c) Decoupled Effects PLS - Neurosynth',
+#                             title2='(d) Neurosynth Templates',
+#                             title='Combined Effects - Neurosynth',
+#                             orientation='horizontal',
+#                             dpi=600)
 
 
 def four_consecutive_plot_generator(img1, img2, img3, img4, figure_length, figure_width,
@@ -113,19 +114,19 @@ def four_consecutive_plot_generator(img1, img2, img3, img4, figure_length, figur
     plt.show()
 
 
-four_consecutive_plot_generator(img1=plt.imread('./graphs/FC_Movie.png'),
-                                img2=plt.imread('./graphs/FC_Movie_brain.png'),
-                                img3=plt.imread('./graphs/edges_movie_abs.png'),
-                                img4=plt.imread('./graphs/edges_movie_plot.png'),
-                                figure_length=15,
-                                figure_width=30,
-                                title1='(a) Combined Effects Decoupled PLS - General FC',
-                                title2='(b) Significant Brain Nodes in PLS - General FC',
-                                title3='(c) Combined Effects Decoupled PLS - Edges',
-                                title4='(d) Significant Brain Nodes in PLS - Edges',
-                                title='Combined Effects - Supplementary',
-                                orientation='vertical',
-                                dpi=650)
+# four_consecutive_plot_generator(img1=plt.imread('./graphs/FC_Movie.png'),
+#                                 img2=plt.imread('./graphs/FC_Movie_brain.png'),
+#                                 img3=plt.imread('./graphs/edges_movie_abs.png'),
+#                                 img4=plt.imread('./graphs/edges_movie_plot.png'),
+#                                 figure_length=15,
+#                                 figure_width=30,
+#                                 title1='(a) Combined Effects Decoupled PLS - General FC',
+#                                 title2='(b) Significant Brain Nodes in PLS - General FC',
+#                                 title3='(c) Combined Effects Decoupled PLS - Edges',
+#                                 title4='(d) Significant Brain Nodes in PLS - Edges',
+#                                 title='Combined Effects - Supplementary',
+#                                 orientation='vertical',
+#                                 dpi=650)
 
 # # plot the histogram of r-squared
 # hurst_averages = pd.read_csv('./data_generated/hurst_averages.csv')
@@ -142,55 +143,55 @@ four_consecutive_plot_generator(img1=plt.imread('./graphs/FC_Movie.png'),
 # plt.ylabel('Frequency')
 # plt.show()
 
-# create a three consecutive plot
-fig, ax = plt.subplots(3, 1, figsize=(20, 30), constrained_layout=True)
-for i in range(3):
-    ax[i].set_xticks([])
-    ax[i].set_yticks([])
-    ax[i].spines['top'].set_linewidth(0)
-    ax[i].spines['bottom'].set_linewidth(0)
-    ax[i].spines['left'].set_linewidth(0)
-    ax[i].spines['right'].set_linewidth(0)
-ax[0].imshow(plt.imread('./graphs/pls_movie.png'))
-ax[0].set_title('(a) Combined Effects Decoupled - Hurst', fontsize=30)
-ax[1].imshow(plt.imread('./graphs/Hurst_Movie.png'))
-ax[1].set_title('(b) Significant Brain Nodes in PLS - Hurst', fontsize=30)
-ax[2].imshow(plt.imread('./graphs/Combined Effects - Neurosynth.png'))
-# set position
-ax[0].set_position([0, 0.64, 1, 0.33])
-ax[1].set_position([0, 0.33, 1, 0.30])
-ax[2].set_position([0, 0, 1, 0.36])
-plt.savefig('./graphs/Combined Effects Decoupled', dpi=650)
-plt.show()
+# # create a three consecutive plot
+# fig, ax = plt.subplots(3, 1, figsize=(20, 30), constrained_layout=True)
+# for i in range(3):
+#     ax[i].set_xticks([])
+#     ax[i].set_yticks([])
+#     ax[i].spines['top'].set_linewidth(0)
+#     ax[i].spines['bottom'].set_linewidth(0)
+#     ax[i].spines['left'].set_linewidth(0)
+#     ax[i].spines['right'].set_linewidth(0)
+# ax[0].imshow(plt.imread('./graphs/pls_movie.png'))
+# ax[0].set_title('(a) Combined Effects Decoupled - Hurst', fontsize=30)
+# ax[1].imshow(plt.imread('./graphs/Hurst_Movie.png'))
+# ax[1].set_title('(b) Significant Brain Nodes in PLS - Hurst', fontsize=30)
+# ax[2].imshow(plt.imread('./graphs/Combined Effects - Neurosynth.png'))
+# # set position
+# ax[0].set_position([0, 0.64, 1, 0.33])
+# ax[1].set_position([0, 0.33, 1, 0.30])
+# ax[2].set_position([0, 0, 1, 0.36])
+# plt.savefig('./graphs/Combined Effects Decoupled', dpi=650)
+# plt.show()
 
-# create a five consecutive plot
-fig, ax = plt.subplots(5, 1, figsize=(20, 45), constrained_layout=True)
-for i in range(5):
-    ax[i].set_xticks([])
-    ax[i].set_yticks([])
-    ax[i].spines['top'].set_linewidth(0)
-    ax[i].spines['bottom'].set_linewidth(0)
-    ax[i].spines['left'].set_linewidth(0)
-    ax[i].spines['right'].set_linewidth(0)
-ax[0].imshow(plt.imread('./graphs/hurst_combined.png'))
-ax[0].set_title('(a) Combined Effects (5-condition) PLS - Hurst', fontsize=30)
-ax[1].imshow(plt.imread('./graphs/average_hurst_combined.png'))
-ax[1].set_title('(b) Average H for Significant Brain Nodes in PLS', fontsize=30)
-ax[2].imshow(plt.imread('./graphs/Combined Effects - Hurst.png'))
-ax[2].set_title('(c) Significant Brain Nodes in PLS - Hurst', fontsize=30)
-ax[3].imshow(plt.imread('./graphs/fc_combined.png'))
-ax[3].set_title('(d) Combined Effects PLS (5-condition) - General FC', fontsize=30)
-ax[4].imshow(plt.imread('./graphs/Combined Effects - FC.png'))
-ax[4].set_title('(e) Significant Brain Nodes in PLS - General FC', fontsize=30)
-# set position
-ax[0].set_position([0, 0.79, 1, 0.19])
-ax[1].set_position([0, 0.58, 1, 0.19])
-ax[2].set_position([0, 0.38, 1, 0.18])
-ax[3].set_position([0, 0.19, 1, 0.19])
-ax[4].set_position([0, 0, 1, 0.18])
-# plt.savefig('./graphs/Combined Effects - 5', dpi=650)
-plt.show()
-#
+# # create a five consecutive plot
+# fig, ax = plt.subplots(5, 1, figsize=(20, 45), constrained_layout=True)
+# for i in range(5):
+#     ax[i].set_xticks([])
+#     ax[i].set_yticks([])
+#     ax[i].spines['top'].set_linewidth(0)
+#     ax[i].spines['bottom'].set_linewidth(0)
+#     ax[i].spines['left'].set_linewidth(0)
+#     ax[i].spines['right'].set_linewidth(0)
+# ax[0].imshow(plt.imread('./graphs/hurst_combined.png'))
+# ax[0].set_title('(a) Combined Effects (5-condition) PLS - Hurst', fontsize=30)
+# ax[1].imshow(plt.imread('./graphs/average_hurst_combined.png'))
+# ax[1].set_title('(b) Average H for Significant Brain Nodes in PLS', fontsize=30)
+# ax[2].imshow(plt.imread('./graphs/Combined Effects - Hurst.png'))
+# ax[2].set_title('(c) Significant Brain Nodes in PLS - Hurst', fontsize=30)
+# ax[3].imshow(plt.imread('./graphs/fc_combined.png'))
+# ax[3].set_title('(d) Combined Effects PLS (5-condition) - General FC', fontsize=30)
+# ax[4].imshow(plt.imread('./graphs/Combined Effects - FC.png'))
+# ax[4].set_title('(e) Significant Brain Nodes in PLS - General FC', fontsize=30)
+# # set position
+# ax[0].set_position([0, 0.79, 1, 0.19])
+# ax[1].set_position([0, 0.58, 1, 0.19])
+# ax[2].set_position([0, 0.38, 1, 0.18])
+# ax[3].set_position([0, 0.19, 1, 0.19])
+# ax[4].set_position([0, 0, 1, 0.18])
+# # plt.savefig('./graphs/Combined Effects - 5', dpi=650)
+# plt.show()
+
 # # network summary
 # movie_propofol_h = plt.imread('./graphs/brain_loading_Narrative Listening + Propofol - H.png')
 # movie_propofol_fc = plt.imread('./graphs/brain_loading_Narrative Listening + Propofol - FC.png')
@@ -265,7 +266,40 @@ plt.show()
 #
 #
 
+def draw_triangle(points, color, my_turtle):
+    my_turtle.fillcolor(color)
+    my_turtle.up()
+    my_turtle.goto(points[0][0], points[0][1])
+    my_turtle.down()
+    my_turtle.begin_fill()
+    my_turtle.goto(points[1][0], points[1][1])
+    my_turtle.goto(points[2][0], points[2][1])
+    my_turtle.goto(points[0][0], points[0][1])
+    my_turtle.end_fill()
 
+
+def midpoint(point1, point2):
+    return ((point1[0] + point2[0]) / 2, (point1[1] + point2[1]) / 2)
+
+
+def sierpinski(points, degree, my_turtle):
+    colormap = ['red', 'gold', 'green', 'skyblue']
+    # colormap = ['black', 'white', 'black', 'black']
+    draw_triangle(points, colormap[degree], my_turtle)
+    if degree > 0:
+        sierpinski([points[0], midpoint(points[0], points[1]), midpoint(points[0], points[2])], degree-1, my_turtle)
+        sierpinski([points[1], midpoint(points[0], points[1]), midpoint(points[1], points[2])], degree-1, my_turtle)
+        sierpinski([points[2], midpoint(points[2], points[1]), midpoint(points[0], points[2])], degree-1, my_turtle)
+
+
+my_turtle = turtle.Turtle()
+screen = turtle.Screen()
+points = [[-200, -150], [0, 200], [200, -150]]
+sierpinski(points, 3, my_turtle)
+
+canvas = turtle.getcanvas()
+canvas.postscript(file="sierpinski_triangle.ps", colormode='color')
+screen.exitonclick()
 
 
 

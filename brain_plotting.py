@@ -80,9 +80,9 @@ fc_combined = new_df_fc_combined.iloc[:, 0].tolist()
 # np.save('./data_generated/nodes_with_fc_values_combined.npy', nodes_with_fc_values_combined)
 
 
-# check the range of the hurst values discarding NaN values
-print(min([x for x in fc_combined if str(x) != 'nan']))
-print(max([x for x in fc_combined if str(x) != 'nan']))
+# # check the range of the hurst values discarding NaN values
+# print(min([x for x in fc_combined if str(x) != 'nan']))
+# print(max([x for x in fc_combined if str(x) != 'nan']))
 
 # convert the list to negative values
 hurst = [-x for x in hurst]
@@ -161,7 +161,7 @@ def brain_plotting (df, title, vmin, vmax, cmap, nodes_with_missing_values=None)
 # brain_plotting(fc_double_two_way, 'brain loadings - fc', 0, 0.2, 'Blues')
 # brain_plotting(fc_double_merged, 'brain loadings - fc', 0, 0.2, 'Blues')
 # brain_plotting(hurst_last_60_TR, 'Effect of Propofol - Hurst', 0, 0.16, 'Blues')
-# # brain_plotting(hurst_effect_of_movie, 'Effect of Narrative Listening - Hurst', vmin=0, vmax=0.15, cmap='Blues')
+# brain_plotting(hurst_effect_of_movie, 'Effect of Narrative Listening - Hurst', vmin=0, vmax=0.15, cmap='Blues')
 # brain_plotting(hurst_double_three_way, 'brain loadings - double three way', 0, 0.2, 'Blues')
 # brain_plotting(hurst_double_two_way, 'brain loadings - double two way', 0, 0.2, 'Blues')
 # brain_plotting(hurst_double_merged, 'brain loadings - double merged', 0, 0.2, 'Blues')

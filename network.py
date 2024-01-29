@@ -99,23 +99,26 @@ def find_network(file_path: str, hurst=None, condition: str = None):
     value_count = value_count.reindex(network_order)
     network_bl = network_bl.reindex(network_order)
 
-    fig, ax = plt.subplots(1, 2, figsize=(30, 10))
+    fig, ax = plt.subplots(1, 2, figsize=(30, 12))
     ax[0].bar(value_count.index, value_count.values)
-    ax[0].set_title('Number of Nodes in Each Network for ' + condition)
-    ax[0].set_xlabel('Network')
+    # ax[0].set_title('Number of Nodes in Each Network for ' + condition)
+    # ax[0].set_xlabel('Network')
     ax[0].set_ylabel('Number of Nodes')
     ax[0].yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax[0].set_xticks(range(len(value_count.index)))
+    # ax[0].set_xticklabels([])
     ax[0].set_xticklabels(rotation=45, ha='right', labels=value_count.index)
     fig.subplots_adjust(bottom=0.3)
     ax[1].bar(network_bl.index, network_bl.values)
     # manually code the order of the x-axis labels
     ax[1].set_xticks(range(len(value_count.index)))
-    ax[1].set_title('Mean Absolute Brain Loadings for Each Network for ' + condition)
-    ax[1].set_xlabel('Network')
+    # ax[1].set_title('Mean Absolute Brain Loadings for Each Network for ' + condition)
+    # ax[1].set_xlabel('Network')
     ax[1].set_ylabel('Mean Absolute Brain Loadings')
     ax[1].set_ylim(bottom=0.05)
     # # set the number of ticks on the y-axis to start at 0.07 and end at 0.12
-    # ax[1].yaxis.set_ticks(np.arange(0.05, 0.119, 0.01))
+    # ax[1].yaxis.set_ticks(np.arange(0.05, 0.119, 0.01))# Set the x-ticks without labels
+    # ax[1].set_xticklabels([])
     ax[1].set_xticklabels(rotation=45, ha='right', labels=network_bl.index)
     fig.subplots_adjust(bottom=0.3)
     plt.savefig('./graphs/brain_loading_' + condition + '.png')
@@ -132,21 +135,21 @@ def find_network(file_path: str, hurst=None, condition: str = None):
     return posthoc
 
 
-posthoc_all = find_network('./data_generated/nodes_with_hurst_values.npy', hurst, 'Narrative Listening + Propofol - H')
+# posthoc_all = find_network('./data_generated/nodes_with_hurst_values.npy', hurst, 'Narrative Listening + Propofol - H')
 # posthoc_mild = find_network('./data_generated/nodes_with_hurst_values_02.npy', hurst_movie_02, 'Mild Sedation')
 # posthoc_deep = find_network('./data_generated/nodes_with_hurst_values_03.npy', hurst_movie_03, 'Deep Sedation')
 # find_network('./data_generated/nodes_with_hurst_values_01_3.npy', hurst_movie_01_3, 'awake')
-posthoc_rest = find_network('./data_generated/nodes_with_hurst_values_last_60_TR.npy', hurst_last_60_TR, 'Propofol - H')
-posthoc_effect_of_movie = find_network('./data_generated/nodes_with_hurst_values_effect_of_movie.npy', hurst_effect_of_movie, 'Narrative Listening - H')
+# posthoc_rest = find_network('./data_generated/nodes_with_hurst_values_last_60_TR.npy', hurst_last_60_TR, 'Propofol - H')
+# posthoc_effect_of_movie = find_network('./data_generated/nodes_with_hurst_values_effect_of_movie.npy', hurst_effect_of_movie, 'Narrative Listening - H')
 
-
-posthoc_fc_movie = find_network('./data_generated/nodes_with_fc_values.npy', fc_movie, 'Narrative Listening + Propofol - FC')
+#
+# posthoc_fc_movie = find_network('./data_generated/nodes_with_fc_values.npy', fc_movie, 'Narrative Listening + Propofol - FC')
 # posthoc_fc_rest = find_network('./data_generated/nodes_with_fc_values_rest.npy', fc_rest, 'Resting State')
 # posthoc_fc_movie_abs = find_network('./data_generated/nodes_with_fc_values_abs.npy', fc_movie_abs, 'Narrative Listening')
 # posthoc_fc_double_two_way = find_network('./data_generated/nodes_with_fc_values_double_two_way.npy', fc_double_two_way, 'Propofol + Narrative Listening')
-posthoc_fc_rest_last_60_TR = find_network('./data_generated/nodes_with_fc_values_rest_last_60_TR.npy', fc_rest_last_60_TR, 'Propofol - FC')
-# posthoc_hurst_double_two_way = find_network('./data_generated/nodes_with_hurst_double_two_way.npy', hurst_double_two_way, 'Propofol + Narrative Listening')
-posthoc_fc_effect_of_movie = find_network('./data_generated/nodes_with_fc_values_effect_of_movie.npy', fc_effect_of_movie, 'Narrative Listening - FC')
+# posthoc_fc_rest_last_60_TR = find_network('./data_generated/nodes_with_fc_values_rest_last_60_TR.npy', fc_rest_last_60_TR, 'Propofol - FC')
+# # posthoc_hurst_double_two_way = find_network('./data_generated/nodes_with_hurst_double_two_way.npy', hurst_double_two_way, 'Propofol + Narrative Listening')
+# posthoc_fc_effect_of_movie = find_network('./data_generated/nodes_with_fc_values_effect_of_movie.npy', fc_effect_of_movie, 'Narrative Listening - FC')
 
 # # plot the atlas
 # atlas = load_shen_268(1)

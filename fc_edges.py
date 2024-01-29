@@ -36,15 +36,15 @@ with open('./pickles/fc_dict.pickle', 'rb') as f:
         flattened_matrix = upper_triangle_flattened(value)
         df = pd.DataFrame(({'edges': edges, 'values': flattened_matrix}))
         fc_dict[key] = df
-
-    all_data = pd.concat(fc_dict, names=['key'])
-    all_data.reset_index(inplace=True)
-    pivoted_data = all_data.pivot(index='key', columns='edges', values='values')
-
-    edges_movie_awake = pivoted_data[pivoted_data.index.str.contains('movie_01_LPI')]
-    edges_movie_mild = pivoted_data[pivoted_data.index.str.contains('movie_02_LPI')]
-    edges_movie_deep = pivoted_data[pivoted_data.index.str.contains('movie_03_LPI')]
-    edges_movie_recovery = pivoted_data[pivoted_data.index.str.contains('movie_04_LPI')]
+#
+#     all_data = pd.concat(fc_dict, names=['key'])
+#     all_data.reset_index(inplace=True)
+#     pivoted_data = all_data.pivot(index='key', columns='edges', values='values')
+#
+#     edges_movie_awake = pivoted_data[pivoted_data.index.str.contains('movie_01_LPI')]
+#     edges_movie_mild = pivoted_data[pivoted_data.index.str.contains('movie_02_LPI')]
+#     edges_movie_deep = pivoted_data[pivoted_data.index.str.contains('movie_03_LPI')]
+#     edges_movie_recovery = pivoted_data[pivoted_data.index.str.contains('movie_04_LPI')]
     # edges_rest_awake = pivoted_data[pivoted_data.index.str.contains('rest_01_LPI')]
     # edges_rest_mild = pivoted_data[pivoted_data.index.str.contains('rest_02_LPI')]
     # edges_rest_deep = pivoted_data[pivoted_data.index.str.contains('rest_03_LPI')]
@@ -272,7 +272,7 @@ def matrix_generator(new_df_edges):
 # plt.show()
 
 # plotting.plot_connectome(matrix_generator(new_df_edges_rest), coordinates, colorbar=True, node_size=0, edge_threshold="99.8%")
-# plt.savefig('./graphs/edges_effect_of_propofol_plot.png', dpi=650)
+# plt.savefig('./graphs/edges_effect_of_propofol_plot.png', dpi=800)
 # plt.show()
 
 # plotting.plot_connectome(matrix_generator(new_df_edges_effect_of_movie), coordinates, colorbar=True, node_size=0, edge_threshold="99.8%")

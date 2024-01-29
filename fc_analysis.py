@@ -13,20 +13,20 @@ from sklearn.linear_model import LinearRegression
 import statsmodels.api as sm
 
 
-# fc_dict = {}
-#
-# for array_2d, file in read_files_268(directory='data_clean'):
-#     corr = np.corrcoef(array_2d)
-#     corr_z = np.arctanh(corr)
-#     np.fill_diagonal(corr_z, 2.0000)
-#     fc_dict[file] = corr_z
-#
-#     print(f'file: {file}')
-#
-# with open('fc_dict.pickle', 'wb') as outfile:
-#     pickle.dump(fc_dict, outfile)
-#
-# print('done')
+fc_dict = {}
+
+for array_2d, file in read_files_268(directory='data_clean'):
+    corr = np.corrcoef(array_2d)
+    corr_z = np.arctanh(corr)
+    np.fill_diagonal(corr_z, 2.0000)
+    fc_dict[file] = corr_z
+
+    print(f'file: {file}')
+
+with open('fc_dict.pickle', 'wb') as outfile:
+    pickle.dump(fc_dict, outfile)
+
+print('done')
 
 # # create a new version of the dictionary for the last 60 TRs of rest
 # fc_dict_last_60_TR = {}
@@ -241,6 +241,8 @@ nodes_with_fc_values_rest_last_60_TR = np.load('./data_generated/nodes_with_fc_v
                                                allow_pickle=True).tolist()
 nodes_with_fc_values_double_three_way = np.load('./data_generated/nodes_with_fc_values_double_three_way.npy',
                                                 allow_pickle=True).tolist()
+nodes_with_fc_values_combined = np.load('./data_generated/nodes_with_fc_values_combined.npy',
+                                        allow_pickle=True).tolist()
 
 # drop the nan columns
 fc_movie_awake_clean = fc_movie_awake.drop(fc_movie_nan, axis=1).drop(fc_movie_nan, axis=0)
@@ -347,6 +349,12 @@ fc_double_rest_awake_pls = fc_double_rest_awake[nodes_with_fc_values_double_thre
 fc_double_movie_mild_pls = fc_double_movie_mild[nodes_with_fc_values_double_three_way]
 fc_double_movie_deep_pls = fc_double_movie_deep[nodes_with_fc_values_double_three_way]
 
+fc_combined_rest_awake_pls = fc_combined_rest_awake_clean[nodes_with_fc_values_combined]
+fc_combined_movie_awake_pls = fc_combined_movie_awake_clean[nodes_with_fc_values_combined]
+fc_combined_movie_mild_pls = fc_combined_movie_mild_clean[nodes_with_fc_values_combined]
+fc_combined_movie_deep_pls = fc_combined_movie_deep_clean[nodes_with_fc_values_combined]
+fc_combined_movie_recovery_pls = fc_combined_movie_recovery_clean[nodes_with_fc_values_combined]
+
 # take the mean of the fc matrices
 fc_movie_awake_pls_mean = fc_movie_awake_pls.mean(axis=0)
 fc_movie_mild_pls_mean = fc_movie_mild_pls.mean(axis=0)
@@ -373,38 +381,63 @@ fc_double_rest_awake_pls_mean = fc_double_rest_awake_pls.mean(axis=0)
 fc_double_movie_mild_pls_mean = fc_double_movie_mild_pls.mean(axis=0)
 fc_double_movie_deep_pls_mean = fc_double_movie_deep_pls.mean(axis=0)
 
+fc_combined_rest_awake_pls_mean = fc_combined_rest_awake_pls.mean(axis=0)
+fc_combined_movie_awake_pls_mean = fc_combined_movie_awake_pls.mean(axis=0)
+fc_combined_movie_mild_pls_mean = fc_combined_movie_mild_pls.mean(axis=0)
+fc_combined_movie_deep_pls_mean = fc_combined_movie_deep_pls.mean(axis=0)
+fc_combined_movie_recovery_pls_mean = fc_combined_movie_recovery_pls.mean(axis=0)
+
 # # t-test
 # print(ttest_rel(fc_movie_awake_pls_mean, fc_movie_mild_pls_mean))
 # print(fc_movie_mean.mean())
 # print(fc_rest_mean.mean())
 
-# # plot the mean fc matrices
-# plt.boxplot([fc_movie_awake_pls_mean, fc_movie_mild_pls_mean, fc_movie_deep_pls_mean, fc_movie_recovery_pls_mean])
-# plt.xticks([1, 2, 3, 4], ['awake', 'mild', 'deep', 'recovery'])
-# plt.ylabel('mean fc')
-# plt.show()
-#
+# plot the mean fc matrices
+data = [fc_combined_rest_awake_pls_mean, fc_combined_movie_awake_pls_mean, fc_combined_movie_mild_pls_mean,
+        fc_combined_movie_deep_pls_mean, fc_combined_movie_recovery_pls_mean]
+
+# Mean values for each data set
+mean_values = [np.mean(dataset) for dataset in data]
+
+# Standard error for each data set
+standard_errors = [np.std(dataset) / np.sqrt(len(dataset)) for dataset in data]
+
+# Bar positions
+positions = range(1, 6)
+
+# Create bar graph with error bars
+plt.bar(positions, mean_values, yerr=standard_errors, align='center', alpha=0.7, capsize=10)
+
+# Set the x-ticks
+plt.xticks(positions, ['awake', 'awake', 'mild', 'deep', 'recovery'])
+
+# Label the y-axis
+plt.ylabel('mean fc')
+
+# Show the plot
+plt.show()
+
 # plt.boxplot([fc_rest_awake_pls_mean, fc_rest_mild_pls_mean, fc_rest_deep_pls_mean, fc_rest_recovery_pls_mean])
 # plt.xticks([1, 2, 3, 4], ['awake', 'mild', 'deep', 'recovery'])
 # plt.ylabel('mean fc')
 # plt.show()
 #
-plt.boxplot([fc_rest_effect_of_movie_pls_mean, fc_movie_effect_of_movie_pls_mean])
-plt.xticks([1, 2], ['Rest', 'Narrative Listening'])
-plt.ylabel('mean fc')
-plt.show()
-#
+# plt.boxplot([fc_rest_effect_of_movie_pls_mean, fc_movie_effect_of_movie_pls_mean])
+# plt.xticks([1, 2], ['Rest', 'Narrative Listening'])
+# plt.ylabel('mean fc')
+# plt.show()
+# #
 # plt.boxplot([fc_rest_awake_last_60_TR_pls_mean, fc_rest_mild_last_60_TR_pls_mean, fc_rest_deep_last_60_TR_pls_mean,
 #                 fc_rest_recovery_last_60_TR_pls_mean])
 # plt.xticks([1, 2, 3, 4], ['awake', 'mild', 'deep', 'recovery'])
 # plt.ylabel('mean fc')
 # plt.show()
 
-# plot the mean fc matrices
-plt.boxplot([fc_double_rest_awake_pls_mean, fc_double_movie_mild_pls_mean, fc_double_movie_deep_pls_mean])
-plt.xticks([1, 2, 3], ['rest', 'movie_mild', 'movie_deep'])
-plt.ylabel('mean fc')
-plt.show()
+# # plot the mean fc matrices
+# plt.boxplot([fc_double_rest_awake_pls_mean, fc_double_movie_mild_pls_mean, fc_double_movie_deep_pls_mean])
+# plt.xticks([1, 2, 3], ['rest', 'movie_mild', 'movie_deep'])
+# plt.ylabel('mean fc')
+# plt.show()
 
 
 # calculate the spearman correlation
