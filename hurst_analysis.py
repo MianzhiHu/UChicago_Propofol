@@ -1,11 +1,10 @@
 import os
 import pickle
-from statistics import mean
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import scipy.stats as stats
-from Propofol.dfa import dfa
+from dfa import dfa
 
 target_dir = 'data_clean'
 
@@ -58,9 +57,6 @@ def preprocess():
 
 
 #preprocess()
-
-
-if __name__ == '__main__':
 
 #     print('show results from pickle')
 #
@@ -238,40 +234,8 @@ if __name__ == '__main__':
     #     print(df)
     #     df.to_csv('hurst_averages.csv', index=False)
 
-    with open('outcome_268.pickle', 'rb') as f:
-        results_dict = pickle.load(f)
-        counter = 0
-        for key, value in results_dict.items():
-            keys = list(results_dict.keys())
-            values = [value['hurst'] for value in results_dict.values()]
-            # vertically stack the hurst values
-            hurst_values = np.vstack(values)
-            r_squared = [value['r_squared'] for value in results_dict.values()]
-            # vertically stack the r_squared values
-            r_squared_values = np.vstack(r_squared)
 
-# load the data
-example_high = np.load('./data_clean/02CB_01_rest_01_LPI_000.npy')
-example_high = example_high[4,:]
-
-example_low = np.load('./data_clean/02CB_01_rest_03_LPI_000.npy')
-example_low = example_low[2,:]
-
-# plot example_high and example_low as subplots
-fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(10, 8), dpi=160)
-plt.xlim(-2, 255)
-plt.xlabel('Time', fontsize=13)
-ax1.plot(example_high, color='red')
-ax1.set_title('Example High Hurst Time Series')
-ax2.plot(example_low, color='blue')
-ax2.set_title('Example Low Hurst Time Series')
-# in the upper subplot, add a text
-ax1.text(0.05, 0.05, 'Hurst = 0.96', fontsize=11, color='black', transform=ax1.transAxes)
-# in the lower subplot, add a text
-ax2.text(0.05, 0.05, 'Hurst = 0.50', fontsize=11, color='black', transform=ax2.transAxes)
-plt.show()
-
-with open('outcome_268.pickle', 'rb') as f:
+with open('./pickles/outcome_268.pickle', 'rb') as f:
     results_dict = pickle.load(f)
     for key, value in results_dict.items():
         # check how many files contain the string 'rest_01_LPI'

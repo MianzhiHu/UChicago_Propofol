@@ -4,6 +4,8 @@ from matplotlib import pyplot as plt
 from nilearn import plotting, datasets, surface, image
 
 fsaverage = datasets.fetch_surf_fsaverage()
+
+
 def make_side_by_side_surf_plots(name,texture,vmin=None,vmax=None, cmap='RdBu', outlines_texture =None, outlines_labes=None):
     plt.clf()
     plt.rcParams.update({'font.size': 28})

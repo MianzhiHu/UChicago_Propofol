@@ -271,9 +271,9 @@ def matrix_generator(new_df_edges):
 # plt.savefig('./graphs/edges_movie_plot.png', dpi=650)
 # plt.show()
 
-# plotting.plot_connectome(matrix_generator(new_df_edges_rest), coordinates, colorbar=True, node_size=0, edge_threshold="99.8%")
-# plt.savefig('./graphs/edges_effect_of_propofol_plot.png', dpi=800)
-# plt.show()
+plotting.plot_connectome(matrix_generator(new_df_edges_rest), coordinates, colorbar=True, node_size=0, edge_threshold="99.8%")
+plt.savefig('./graphs/edges_effect_of_propofol_plot.png', dpi=800)
+plt.show()
 
 # plotting.plot_connectome(matrix_generator(new_df_edges_effect_of_movie), coordinates, colorbar=True, node_size=0, edge_threshold="99.8%")
 # plt.savefig('./graphs/edges_effect_of_movie_plot.png', dpi=650)

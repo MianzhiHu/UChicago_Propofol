@@ -3,6 +3,10 @@ import pandas as pd
 import numpy as np
 from scipy.stats import gaussian_kde
 import turtle
+import pickle
+from scipy.signal import welch
+from nilearn import plotting
+from atlasTransform.atlasTransform.utils.atlas import load_shen_268
 
 
 def side_by_side_plot_generator(img1, img2, figure_length, figure_width, title, orientation, title1=None, title2=None, loc1=None,
@@ -263,43 +267,138 @@ def four_consecutive_plot_generator(img1, img2, img3, img4, figure_length, figur
 # ax[3][1].set_position([0.5, 0, 0.5, 0.25])
 # plt.savefig('./graphs/individual_effects.png', dpi=2100)
 # plt.show()
+
+# plotting for figure 1
+with open('./pickles/outcome_268.pickle', 'rb') as f:
+    results_dict = pickle.load(f)
+    counter = 0
+    for key, value in results_dict.items():
+        keys = list(results_dict.keys())
+        values = [value['hurst'] for value in results_dict.values()]
+        # vertically stack the hurst values
+        hurst_values = np.vstack(values)
+        r_squared = [value['r_squared'] for value in results_dict.values()]
+        # vertically stack the r_squared values
+        r_squared_values = np.vstack(r_squared)
+
+# # load the data
+# example_high = np.load('./data_clean/02CB_01_rest_01_LPI_000.npy')
+# example_high = example_high[4,:]
+#
+# example_low = np.load('./data_clean/02CB_01_rest_03_LPI_000.npy')
+# example_low = example_low[2,:]
+
+
+# Function to plot Welch's power spectral density estimate
+def plot_welch_spectrum(time_series, title):
+    # Use different window sizes for spectral estimation
+    for nperseg in [len(time_series) // 16, len(time_series) // 8, len(time_series) // 4, len(time_series) // 2]:
+        freqs, powers = welch(time_series, nperseg=nperseg)
+        plt.plot(freqs, powers, label=f'Window size: {nperseg}s')
+    plt.title(title)
+    plt.xlabel('Frequency (Hz)')
+    plt.ylabel('Power')
+    plt.legend()
+    plt.show()
+
+# # plot the Welch's power spectral density estimate for the high and low Hurst time series
+# plot_welch_spectrum(example_high, 'Power Spectral Density Estimate for High Hurst Time Series')
+# plot_welch_spectrum(example_low, 'Power Spectral Density Estimate for Low Hurst Time Series')
 #
 #
-
-def draw_triangle(points, color, my_turtle):
-    my_turtle.fillcolor(color)
-    my_turtle.up()
-    my_turtle.goto(points[0][0], points[0][1])
-    my_turtle.down()
-    my_turtle.begin_fill()
-    my_turtle.goto(points[1][0], points[1][1])
-    my_turtle.goto(points[2][0], points[2][1])
-    my_turtle.goto(points[0][0], points[0][1])
-    my_turtle.end_fill()
-
-
-def midpoint(point1, point2):
-    return ((point1[0] + point2[0]) / 2, (point1[1] + point2[1]) / 2)
+# # plot example_high and example_low as subplots
+# fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(10, 8), dpi=160)
+# plt.xlim(-2, 255)
+# plt.xlabel('Time', fontsize=13)
+# ax1.plot(example_high, color='red')
+# ax1.set_title('Example High Hurst Time Series')
+# ax2.plot(example_low, color='blue')
+# ax2.set_title('Example Low Hurst Time Series')
+# # in the upper subplot, add a text
+# ax1.text(0.05, 0.05, 'Hurst = 0.96', fontsize=11, color='black', transform=ax1.transAxes)
+# # in the lower subplot, add a text
+# ax2.text(0.05, 0.05, 'Hurst = 0.50', fontsize=11, color='black', transform=ax2.transAxes)
+# plt.show()
 
 
-def sierpinski(points, degree, my_turtle):
-    colormap = ['red', 'gold', 'green', 'skyblue']
-    # colormap = ['black', 'white', 'black', 'black']
-    draw_triangle(points, colormap[degree], my_turtle)
-    if degree > 0:
-        sierpinski([points[0], midpoint(points[0], points[1]), midpoint(points[0], points[2])], degree-1, my_turtle)
-        sierpinski([points[1], midpoint(points[0], points[1]), midpoint(points[1], points[2])], degree-1, my_turtle)
-        sierpinski([points[2], midpoint(points[2], points[1]), midpoint(points[0], points[2])], degree-1, my_turtle)
+# draw the Sierpinski triangle example
+def draw_sierpinski_triangle_specific_section(vertices, depth, ax, target_depth, current_depth=0):
+    if current_depth == target_depth:
+        # At the target depth, fill the triangle with a specific color
+        ax.fill(*zip(*vertices), edgecolor="grey", facecolor="black", linewidth=0.5)
+    elif current_depth < target_depth:
+        # Calculate the midpoints of the triangle's sides
+        midpoint01 = (vertices[0] + vertices[1]) / 2
+        midpoint12 = (vertices[1] + vertices[2]) / 2
+        midpoint20 = (vertices[2] + vertices[0]) / 2
+
+        # Recursively draw smaller triangles
+        draw_sierpinski_triangle_specific_section([vertices[0], midpoint01, midpoint20], depth, ax, target_depth, current_depth + 1)
+        draw_sierpinski_triangle_specific_section([vertices[1], midpoint12, midpoint01], depth, ax, target_depth, current_depth + 1)
+        draw_sierpinski_triangle_specific_section([vertices[2], midpoint20, midpoint12], depth, ax, target_depth, current_depth + 1)
+    else:
+        # For depths greater than the target, do not draw to leave the section empty
+        return
 
 
-my_turtle = turtle.Turtle()
-screen = turtle.Screen()
-points = [[-200, -150], [0, 200], [200, -150]]
-sierpinski(points, 3, my_turtle)
+# fig, ax = plt.subplots()
+# ax.set_aspect('equal')
+# ax.axis('off')
+# plt.gca().set_facecolor('white')
+#
+# # remove x and y axis
+# plt.xticks([])
+# plt.yticks([])
+# plt.axis('off')
+#
+#
+# # Define the vertices of the initial triangle
+# vertices = np.array([[0, 0], [1, 0], [0.5, np.sqrt(3) / 2]])
+#
+# # Draw the specific 1/3 section of the Sierpinski triangle by targeting a specific depth
+# total_depth = 5  # Total depth of the whole figure
+# target_depth = total_depth - 1  # Depth of the section to highlight (1 level above the total to represent 1/3 of the figure)
+#
+# # Draw the entire Sierpinski triangle but highlight a specific section
+# draw_sierpinski_triangle_specific_section(vertices, total_depth, ax, target_depth)
+#
+# plt.show()
 
-canvas = turtle.getcanvas()
-canvas.postscript(file="sierpinski_triangle.ps", colormode='color')
-screen.exitonclick()
+
+def draw_sierpinski_line_improved_light_gray(vertices, depth, ax, level=0):
+    if depth == 0:
+        # Use a gradient of gray shades based on the recursion depth
+        gray_value = 0.8 - (level * 0.1) % 0.55  # Cycle through lighter shades of gray
+        ax.fill(*zip(*vertices), edgecolor="grey", facecolor="grey", linewidth=0.5)
+    else:
+        # Calculate the midpoints of the triangle's sides
+        midpoint01 = (vertices[0] + vertices[1]) / 2
+        midpoint12 = (vertices[1] + vertices[2]) / 2
+        midpoint20 = (vertices[2] + vertices[0]) / 2
+
+        # Recursively draw smaller triangles
+        draw_sierpinski_line_improved_light_gray([vertices[0], midpoint01, midpoint20], depth - 1, ax, level + 1)
+        draw_sierpinski_line_improved_light_gray([vertices[1], midpoint12, midpoint01], depth - 1, ax, level + 1)
+        draw_sierpinski_line_improved_light_gray([vertices[2], midpoint20, midpoint12], depth - 1, ax, level + 1)
 
 
+# fig, ax = plt.subplots()
+# ax.set_aspect('equal')
+# ax.axis('off')
+# plt.gca().set_facecolor('white')
+#
+# # Define the vertices of the initial triangle
+# vertices = np.array([[0, 0], [1, 0], [0.5, np.sqrt(3) / 2]])
+#
+# # Draw the Sierpinski triangle using filled triangles with a specified depth of recursion
+# draw_sierpinski_line_improved_light_gray(vertices, 5, ax)
+#
+# plt.show()
 
+
+# plotting for figure 2
+# Plot a blank glass brain
+plotting.plot_glass_brain(None, display_mode='r')
+
+# Show the plot
+plotting.show()
