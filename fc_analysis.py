@@ -4,10 +4,12 @@ import pickle
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
-from plotting_preparation import fc_lv_vals_movie, fc_lv_vals_rest, \
+from plotting_preparation import (fc_lv_vals_movie, fc_lv_vals_rest, \
     fc_movie_nan, fc_rest_nan, lv_vals, lv_vals_rest_last_60_TR, lv_vals_effect_of_movie, \
     df_movie_missing, df_last_60_TR_missing, effect_of_movie_nan, fc_lv_vals_effect_of_movie, \
-    fc_effect_of_movie_nan, fc_lv_vals_rest_last_60_TR, fc_lv_vals_combined, lv_vals_combined
+    fc_effect_of_movie_nan, fc_lv_vals_rest_last_60_TR, fc_lv_vals_combined, lv_vals_combined, fc_lv_vals_everything, \
+    lv_vals_movie_everything)
+
 from brainsmash.mapgen.stats import spearmanr
 from sklearn.linear_model import LinearRegression
 import statsmodels.api as sm
@@ -44,6 +46,7 @@ print('done')
 #     pickle.dump(fc_dict_last_60_TR, outfile)
 #
 # print('done')
+
 
 def scatter_plot():
     with open('./pickles/fc_dict.pickle', 'rb') as f:
@@ -243,6 +246,8 @@ nodes_with_fc_values_double_three_way = np.load('./data_generated/nodes_with_fc_
                                                 allow_pickle=True).tolist()
 nodes_with_fc_values_combined = np.load('./data_generated/nodes_with_fc_values_combined.npy',
                                         allow_pickle=True).tolist()
+nodes_with_fc_values_everything = np.load('./data_generated/nodes_with_fc_values_everything.npy',
+                                          allow_pickle=True).tolist()
 
 # drop the nan columns
 fc_movie_awake_clean = fc_movie_awake.drop(fc_movie_nan, axis=1).drop(fc_movie_nan, axis=0)
@@ -292,6 +297,17 @@ fc_double_movie_deep = fc_movie_deep.drop(fc_double_nan, axis=1).drop(
     fc_double_nan, axis=0)
 # take the average of the two movie fc matrices
 fc_double_movie = (fc_double_movie_mild + fc_double_movie_deep) / 2
+
+# for all
+list_of_originals = [fc_movie_awake, fc_movie_mild, fc_movie_deep, fc_movie_recovery,
+                     fc_rest_awake_last_60_TR, fc_rest_mild_last_60_TR, fc_rest_deep_last_60_TR, fc_rest_recovery_last_60_TR]
+list_of_cleans = ['fc_movie_awake_everything', 'fc_movie_mild_everything', 'fc_movie_deep_everything', 'fc_movie_recovery_everything',
+                    'fc_rest_awake_everything', 'fc_rest_mild_everything', 'fc_rest_deep_everything', 'fc_rest_recovery_everything']
+
+# for original, clean in zip(list_of_originals, list_of_cleans):
+#     cleaned = original.drop(fc_all_nan, axis=1).drop(fc_all_nan, axis=0)
+#     cleaned.to_csv(f'./data_generated/{clean}.csv', index=False, header=False)
+
 
 # # save the cleaned fc matrices as csv files
 # fc_movie_awake_clean.to_csv('./data_generated/fc_movie_awake_abs.csv', index=False, header=False)
@@ -355,6 +371,15 @@ fc_combined_movie_mild_pls = fc_combined_movie_mild_clean[nodes_with_fc_values_c
 fc_combined_movie_deep_pls = fc_combined_movie_deep_clean[nodes_with_fc_values_combined]
 fc_combined_movie_recovery_pls = fc_combined_movie_recovery_clean[nodes_with_fc_values_combined]
 
+fc_movie_awake_everything_pls = fc_movie_awake.drop(fc_all_nan, axis=1).drop(fc_all_nan, axis=0)[nodes_with_fc_values_everything]
+fc_rest_awake_everything_pls = fc_rest_awake.drop(fc_all_nan, axis=1).drop(fc_all_nan, axis=0)[nodes_with_fc_values_everything]
+fc_movie_mild_everything_pls = fc_movie_mild.drop(fc_all_nan, axis=1).drop(fc_all_nan, axis=0)[nodes_with_fc_values_everything]
+fc_rest_mild_everything_pls = fc_rest_mild.drop(fc_all_nan, axis=1).drop(fc_all_nan, axis=0)[nodes_with_fc_values_everything]
+fc_movie_deep_everything_pls = fc_movie_deep.drop(fc_all_nan, axis=1).drop(fc_all_nan, axis=0)[nodes_with_fc_values_everything]
+fc_rest_deep_everything_pls = fc_rest_deep.drop(fc_all_nan, axis=1).drop(fc_all_nan, axis=0)[nodes_with_fc_values_everything]
+fc_movie_recovery_everything_pls = fc_movie_recovery.drop(fc_all_nan, axis=1).drop(fc_all_nan, axis=0)[nodes_with_fc_values_everything]
+fc_rest_recovery_everything_pls = fc_rest_recovery.drop(fc_all_nan, axis=1).drop(fc_all_nan, axis=0)[nodes_with_fc_values_everything]
+
 # take the mean of the fc matrices
 fc_movie_awake_pls_mean = fc_movie_awake_pls.mean(axis=0)
 fc_movie_mild_pls_mean = fc_movie_mild_pls.mean(axis=0)
@@ -387,41 +412,58 @@ fc_combined_movie_mild_pls_mean = fc_combined_movie_mild_pls.mean(axis=0)
 fc_combined_movie_deep_pls_mean = fc_combined_movie_deep_pls.mean(axis=0)
 fc_combined_movie_recovery_pls_mean = fc_combined_movie_recovery_pls.mean(axis=0)
 
+fc_movie_awake_everything_pls_mean = fc_movie_awake_everything_pls.mean(axis=0)
+fc_rest_awake_everything_pls_mean = fc_rest_awake_everything_pls.mean(axis=0)
+fc_movie_mild_everything_pls_mean = fc_movie_mild_everything_pls.mean(axis=0)
+fc_rest_mild_everything_pls_mean = fc_rest_mild_everything_pls.mean(axis=0)
+fc_movie_deep_everything_pls_mean = fc_movie_deep_everything_pls.mean(axis=0)
+fc_rest_deep_everything_pls_mean = fc_rest_deep_everything_pls.mean(axis=0)
+fc_movie_recovery_everything_pls_mean = fc_movie_recovery_everything_pls.mean(axis=0)
+fc_rest_recovery_everything_pls_mean = fc_rest_recovery_everything_pls.mean(axis=0)
+
 # # t-test
 # print(ttest_rel(fc_movie_awake_pls_mean, fc_movie_mild_pls_mean))
 # print(fc_movie_mean.mean())
 # print(fc_rest_mean.mean())
 
-# plot the mean fc matrices
-data = [fc_combined_rest_awake_pls_mean, fc_combined_movie_awake_pls_mean, fc_combined_movie_mild_pls_mean,
-        fc_combined_movie_deep_pls_mean, fc_combined_movie_recovery_pls_mean]
-
-# Mean values for each data set
-mean_values = [np.mean(dataset) for dataset in data]
-
-# Standard error for each data set
-standard_errors = [np.std(dataset) / np.sqrt(len(dataset)) for dataset in data]
-
-# Bar positions
-positions = range(1, 6)
-
-# Create bar graph with error bars
-plt.bar(positions, mean_values, yerr=standard_errors, align='center', alpha=0.7, capsize=10)
-
-# Set the x-ticks
-plt.xticks(positions, ['awake', 'awake', 'mild', 'deep', 'recovery'])
-
-# Label the y-axis
-plt.ylabel('mean fc')
-
-# Show the plot
-plt.show()
+# # plot the mean fc matrices
+# data = [fc_combined_rest_awake_pls_mean, fc_combined_movie_awake_pls_mean, fc_combined_movie_mild_pls_mean,
+#         fc_combined_movie_deep_pls_mean, fc_combined_movie_recovery_pls_mean]
+#
+# # Mean values for each data set
+# mean_values = [np.mean(dataset) for dataset in data]
+#
+# # Standard error for each data set
+# standard_errors = [np.std(dataset) / np.sqrt(len(dataset)) for dataset in data]
+#
+# # Bar positions
+# positions = range(1, 6)
+#
+# # Create bar graph with error bars
+# plt.bar(positions, mean_values, yerr=standard_errors, align='center', alpha=0.7, capsize=10)
+#
+# # Set the x-ticks
+# plt.xticks(positions, ['awake', 'awake', 'mild', 'deep', 'recovery'])
+#
+# # Label the y-axis
+# plt.ylabel('mean fc')
+#
+# # Show the plot
+# plt.show()
 
 # plt.boxplot([fc_rest_awake_pls_mean, fc_rest_mild_pls_mean, fc_rest_deep_pls_mean, fc_rest_recovery_pls_mean])
 # plt.xticks([1, 2, 3, 4], ['awake', 'mild', 'deep', 'recovery'])
 # plt.ylabel('mean fc')
 # plt.show()
-#
+
+# plt.boxplot([fc_movie_awake_everything_pls_mean, fc_rest_awake_everything_pls_mean,
+#              fc_movie_mild_everything_pls_mean, fc_rest_mild_everything_pls_mean,
+#              fc_movie_deep_everything_pls_mean, fc_rest_deep_everything_pls_mean,
+#              fc_movie_recovery_everything_pls_mean, fc_rest_recovery_everything_pls_mean])
+# plt.gca().set_xticklabels(['movie_awake', 'rest_awake', 'movie_mild', 'rest_mild', 'movie_deep', 'rest_deep', 'movie_recovery', 'rest_recovery'])
+# plt.ylabel('mean fc')
+# plt.show()
+
 # plt.boxplot([fc_rest_effect_of_movie_pls_mean, fc_movie_effect_of_movie_pls_mean])
 # plt.xticks([1, 2], ['Rest', 'Narrative Listening'])
 # plt.ylabel('mean fc')
@@ -468,23 +510,42 @@ nan_all_for_spearman_r = list(set(fc_movie_nan).union(set(fc_rest_nan_last_60_TR
         set(effect_of_movie_nan))))
 
 fc_movie_loadings = prepare_for_spearman_r(fc_lv_vals_movie, nan_all_for_spearman_r)
+# This one is a little different because the direction was reversed in the PLS test,
+# so we need to reverse it back
 fc_rest_loadings = prepare_for_spearman_r(fc_lv_vals_rest_last_60_TR, nan_all_for_spearman_r)
+fc_rest_loadings = -fc_rest_loadings
+
 fc_effect_of_movie_loadings = prepare_for_spearman_r(fc_lv_vals_effect_of_movie, nan_all_for_spearman_r)
 fc_combined_loadings = prepare_for_spearman_r(fc_lv_vals_combined, nan_all_for_spearman_r)
+fc_everything_loadings = prepare_for_spearman_r(fc_lv_vals_everything, nan_all_for_spearman_r)
+hurst_everything_loadings = prepare_for_spearman_r(lv_vals_movie_everything, nan_all_for_spearman_r)
 hurst_movie_loadings = prepare_for_spearman_r(lv_vals, nan_all_for_spearman_r)
 hurst_rest_loadings = prepare_for_spearman_r(lv_vals_rest_last_60_TR, nan_all_for_spearman_r)
 hurst_effect_of_movie_loadings = prepare_for_spearman_r(lv_vals_effect_of_movie, nan_all_for_spearman_r)
 hurst_combined_loadings = prepare_for_spearman_r(lv_vals_combined, nan_all_for_spearman_r)
 
 # stack the dataframes
-loadings = pd.concat([fc_movie_loadings, fc_rest_loadings, fc_effect_of_movie_loadings, fc_combined_loadings, hurst_movie_loadings,
-                      hurst_rest_loadings, hurst_effect_of_movie_loadings, hurst_combined_loadings], axis=1).dropna(axis=0, how='any').to_numpy()
+loadings = pd.concat([fc_everything_loadings, fc_effect_of_movie_loadings, fc_rest_loadings, fc_combined_loadings, fc_movie_loadings,
+                      hurst_everything_loadings, hurst_effect_of_movie_loadings, hurst_rest_loadings, hurst_combined_loadings, hurst_movie_loadings],
+                     axis=1).dropna(axis=0, how='any').to_numpy()
 
 # calculate the spearman correlation
-corr_movie = stats.spearmanr(loadings[:, 0], loadings[:, 4])
-corr_rest = stats.spearmanr(loadings[:, 1], loadings[:, 5])
-corr_effect_of_movie = stats.spearmanr(loadings[:, 2], loadings[:, 6])
-corr_effect_of_movie_vs_propofol = stats.spearmanr(loadings[:, 5], loadings[:, 6])
+corr_everything = stats.spearmanr(loadings[:, 0], loadings[:, 5])
+print(f'Correlation between FC and Hurst for everything: {corr_everything}')
+corr_effect_of_movie = stats.spearmanr(loadings[:, 1], loadings[:, 6])
+print(f'Correlation between FC and Hurst for effect of movie: {corr_effect_of_movie}')
+corr_rest = stats.spearmanr(loadings[:, 2], loadings[:, 7])
+print(f'Correlation between FC and Hurst for rest: {corr_rest}')
+corr_combined = stats.spearmanr(loadings[:, 3], loadings[:, 8])
+print(f'Correlation between FC and Hurst for combined: {corr_combined}')
+corr_movie = stats.spearmanr(loadings[:, 4], loadings[:, 9])
+print(f'Correlation between FC and Hurst for movie: {corr_movie}')
+corr_fc_movie_versus_everything = stats.spearmanr(loadings[:, 4], loadings[:, 0])
+print(f'Correlation between FC movie and FC everything: {corr_fc_movie_versus_everything}')
+corr_hurst_movie_versus_everything = stats.spearmanr(loadings[:, 9], loadings[:, 5])
+print(f'Correlation between Hurst movie and Hurst everything: {corr_hurst_movie_versus_everything}')
+corr_fc_propofol_versus_everything = stats.spearmanr(loadings[:, 2], loadings[:, 0])
+print(f'Correlation between FC propofol and FC everything: {corr_fc_propofol_versus_everything}')
 
 # now, verify the results using the spin test
 # load the surrogates

@@ -10,7 +10,7 @@ from scipy.stats import mode
 from scipy.spatial.distance import cdist
 from plotting_preparation import (new_df, new_df_fc_movie, new_df_effect_of_movie, new_df_fc_effect_of_movie,
                                   new_df_rest_last_60_TR, new_df_fc_rest_last_60_TR,
-                                  new_df_combined, new_df_fc_combined)
+                                  new_df_combined, new_df_fc_combined, new_df_fc_everything, new_df_movie_everything)
 from docx import Document
 
 # Load the shen parcellation
@@ -124,7 +124,8 @@ def aggregated_z_score_table(df_hurst, df_fc, table_name):
     doc.save(table_name + '.docx')
 
 
-aggregated_z_score_table(new_df, new_df_fc_movie, 'decoupled_z_score_table')
+# aggregated_z_score_table(new_df, new_df_fc_movie, 'decoupled_z_score_table')
 # aggregated_z_score_table(new_df_effect_of_movie, new_df_fc_effect_of_movie, 'effect_of_movie_z_score_table')
-aggregated_z_score_table(new_df_rest_last_60_TR, new_df_fc_rest_last_60_TR, 'effect_of_propofol_z_score_table')
-aggregated_z_score_table(new_df_combined, new_df_fc_combined, 'combined_effect_z_score_table')
+# aggregated_z_score_table(new_df_rest_last_60_TR, new_df_fc_rest_last_60_TR, 'effect_of_propofol_z_score_table')
+# aggregated_z_score_table(new_df_combined, new_df_fc_combined, 'combined_effect_z_score_table')
+# aggregated_z_score_table(new_df_movie_everything, new_df_fc_everything, 'movie_everything_z_score_table')

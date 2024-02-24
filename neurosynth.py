@@ -34,6 +34,7 @@ fc_rest_nan_last_60_TR = np.load('./data_generated/fc_rest_nan_last_60_TR.npy')
 fc_effect_of_movie_nan = np.load('./data_generated/fc_effect_of_movie_nan.npy')
 fc_double_nan = np.load('./data_generated/fc_double_nan.npy')
 fc_combined_nan = np.load('./data_generated/fc_combined_nan.npy')
+fc_all_nan = np.load('./data_generated/fc_all_nan.npy')
 
 
 
@@ -73,7 +74,9 @@ def neurosynth_hurst(file_path, kept_terms_maps, term_surrogates, p_value, df_mo
 
     discoveries = multipletests(pvals, method='fdr_bh', alpha=p_value)[0]
     discovery_terms = kept_terms[discoveries]
+    print(discovery_terms)
     discovery_corrs = og_term_corrs[discoveries]
+    print(discovery_corrs)
     order = np.argsort(discovery_corrs)
     discovery_terms = discovery_terms[order]
     discovery_corrs = discovery_corrs[order]
@@ -125,7 +128,8 @@ def neurosynth_hurst(file_path, kept_terms_maps, term_surrogates, p_value, df_mo
 # neurosynth_hurst('./data_generated/PLS_outputTaskPLSmovie_03_30_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, df_03_30_missing)
 # neurosynth_hurst('./data_generated/PLS_outputTaskPLSmovie_02_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, df_02_missing)
 # neurosynth_hurst('./data_generated/PLS_outputTaskPLSmovie_1_3_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, df_01_missing)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLSeverything_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, df_everything_missing)
+neurosynth_hurst('./data_generated/PLS_outputTaskPLSeverything_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, df_everything_missing)
+# neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_everything_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, fc_all_nan)
 # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_movie_abs_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, fc_movie_nan)
 # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_movie_lv_vals.mat', kept_terms_maps,term_surrogates, 0.01, fc_movie_nan)
 # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_rest_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, fc_rest_nan)

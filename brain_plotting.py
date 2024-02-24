@@ -8,7 +8,8 @@ from plotting_preparation import new_df, new_df_movie_03, new_df_movie_02, new_d
     new_df_movie_everything, new_df_movie_03_30, new_df_fc_movie, new_df_fc_rest, new_df_fc_movie_abs, \
     new_df_fc_effect_of_movie, new_df_rest_last_60_TR, new_df_effect_of_movie, new_df_fc_rest_last_60_TR, \
     new_df_double_three_way, new_df_double_two_way, new_df_double_merged, new_df_fc_double_three_way, \
-    new_df_fc_double_two_way, new_df_fc_double_merged, new_df_combined, new_df_fc_combined
+    new_df_fc_double_two_way, new_df_fc_double_merged, new_df_combined, new_df_fc_combined, new_df_fc_everything, \
+    hurst_effect_of_movie_full
 from make_side_by_side_surf_plots import make_side_by_side_surf_plots, make_side_by_side_surf_plots_left
 import pandas as pd
 
@@ -27,6 +28,7 @@ hurst_double_three_way = new_df_double_three_way.iloc[:, 0].tolist()
 hurst_double_two_way = new_df_double_two_way.iloc[:, 0].tolist()
 hurst_double_merged = new_df_double_merged.iloc[:, 0].tolist()
 hurst_combined = new_df_combined.iloc[:, 0].tolist()
+hurst_effect_of_movie_full = hurst_effect_of_movie_full.iloc[:, 0].tolist()
 
 fc_movie = new_df_fc_movie.iloc[:, 0].tolist()
 fc_rest = new_df_fc_rest.iloc[:, 0].tolist()
@@ -37,6 +39,7 @@ fc_double_three_way = new_df_fc_double_three_way.iloc[:, 0].tolist()
 fc_double_two_way = new_df_fc_double_two_way.iloc[:, 0].tolist()
 fc_double_merged = new_df_fc_double_merged.iloc[:, 0].tolist()
 fc_combined = new_df_fc_combined.iloc[:, 0].tolist()
+fc_everything = new_df_fc_everything.iloc[:, 0].tolist()
 
 
 # # save the node numbers where the hurst values are not NaN
@@ -59,6 +62,7 @@ fc_combined = new_df_fc_combined.iloc[:, 0].tolist()
 # nodes_with_fc_values_double_three_way = [i for i, x in enumerate(fc_double_three_way) if str(x) != 'nan']
 # nodes_with_fc_values_double_two_way = [i for i, x in enumerate(fc_double_two_way) if str(x) != 'nan']
 # nodes_with_fc_values_combined = [i for i, x in enumerate(fc_combined) if str(x) != 'nan']
+# nodes_with_fc_values_everything = [i for i, x in enumerate(fc_everything) if str(x) != 'nan']
 
 # # save the list as a .npy file
 # np.save('./data_generated/nodes_with_hurst_values.npy', nodes_with_hurst_values)
@@ -78,11 +82,12 @@ fc_combined = new_df_fc_combined.iloc[:, 0].tolist()
 # np.save('./data_generated/nodes_with_hurst_double_two_way.npy', nodes_with_hurst_double_two_way)
 # np.save('./data_generated/nodes_with_hurst_combined.npy', nodes_with_hurst_combined)
 # np.save('./data_generated/nodes_with_fc_values_combined.npy', nodes_with_fc_values_combined)
+# np.save('./data_generated/nodes_with_fc_values_everything.npy', nodes_with_fc_values_everything)
 
 
-# # check the range of the hurst values discarding NaN values
-# print(min([x for x in fc_combined if str(x) != 'nan']))
-# print(max([x for x in fc_combined if str(x) != 'nan']))
+# check the range of the hurst values discarding NaN values
+print(min([x for x in hurst_effect_of_movie_full if str(x) != 'nan']))
+print(max([x for x in hurst_effect_of_movie_full if str(x) != 'nan']))
 
 # convert the list to negative values
 hurst = [-x for x in hurst]
@@ -97,11 +102,14 @@ hurst_double_three_way = [-x for x in hurst_double_three_way]
 hurst_double_two_way = [-x for x in hurst_double_two_way]
 hurst_double_merged = [-x for x in hurst_double_merged]
 hurst_combined = [-x for x in hurst_combined]
+hurst_effect_of_movie_full = [-x for x in hurst_effect_of_movie_full]
 
 fc_movie = [-x for x in fc_movie]
 fc_movie_abs = [-x for x in fc_movie_abs]
 fc_effect_of_movie = [-x for x in fc_effect_of_movie]
 fc_combined = [-x for x in fc_combined]
+fc_everything = [-x for x in fc_everything]
+
 
 # # plot for specific network
 # node_numbers = np.load('./data_generated/nodes_with_hurst_values.npy')  # load node numbers
@@ -152,6 +160,7 @@ def brain_plotting (df, title, vmin, vmax, cmap, nodes_with_missing_values=None)
 # brain_plotting(hurst_movie_01_2, 'brain loadings_01_2', -0.2, 0.2, 'RdBu_r')
 # brain_plotting(hurst_movie_01_3, 'brain loadings_01_3', -0.2, 0.2, 'RdBu_r')
 # brain_plotting(hurst_everything, 'brain loadings - all', 0, 0.15, 'Reds')
+# brain_plotting(hurst_effect_of_movie_full, 'Effect of Narrative Listening - Hurst', -0.1, 0.15, 'RdBu_r')
 # brain_plotting(fc_movie, 'brain loadings - fc', -0.25, 0.25, 'RdBu_r')
 # brain_plotting(fc_rest, 'brain loadings - fc', 0, 0.25, 'Blues')
 # brain_plotting(fc_rest_last_60_TR, 'Effect of Propofol - FC', 0, 0.2, 'Blues')
@@ -160,6 +169,7 @@ def brain_plotting (df, title, vmin, vmax, cmap, nodes_with_missing_values=None)
 # brain_plotting(fc_double_three_way, 'brain loadings - fc', 0, 0.2, 'Blues')
 # brain_plotting(fc_double_two_way, 'brain loadings - fc', 0, 0.2, 'Blues')
 # brain_plotting(fc_double_merged, 'brain loadings - fc', 0, 0.2, 'Blues')
+# brain_plotting(fc_everything, 'brain loadings - fc', 0, 0.2, 'Blues')
 # brain_plotting(hurst_last_60_TR, 'Effect of Propofol - Hurst', 0, 0.16, 'Blues')
 # brain_plotting(hurst_effect_of_movie, 'Effect of Narrative Listening - Hurst', vmin=0, vmax=0.15, cmap='Blues')
 # brain_plotting(hurst_double_three_way, 'brain loadings - double three way', 0, 0.2, 'Blues')
@@ -167,6 +177,7 @@ def brain_plotting (df, title, vmin, vmax, cmap, nodes_with_missing_values=None)
 # brain_plotting(hurst_double_merged, 'brain loadings - double merged', 0, 0.2, 'Blues')
 # brain_plotting(hurst_combined, 'Combined Effects - Hurst', 0, 0.15, 'Blues')
 # brain_plotting(fc_combined, 'Combined Effects - FC', 0, 0.20, 'Blues')
+brain_plotting(fc_everything, 'Everything - FC', 0, 0.20, 'Blues')
 
 
 def brain_plotting_left (df, title, vmin, vmax, cmap, nodes_with_missing_values=None):
@@ -217,6 +228,8 @@ def brain_plotting_left (df, title, vmin, vmax, cmap, nodes_with_missing_values=
 # brain_plotting_left(hurst_double_merged, 'brain loadings - double merged', 0, 0.2, 'Blues')
 # brain_plotting_left(hurst_combined, 'Combined Effects - Hurst', 0, 0.15, 'Blues')
 # brain_plotting_left(fc_combined, 'Combined Effects - FC', 0, 0.20, 'Blues')
+brain_plotting_left(fc_everything, 'Everything - FC', 0, 0.20, 'Blues')
+
 
 # # plot using nilearn
 # visual_attention = nibabel.load('./Neurosynth/visual perception_association-test_z_FDR_0.01.nii.gz')

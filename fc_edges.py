@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from plotting_preparation import new_df_edges_movie, new_df_edges_rest, new_df_edges_effect_of_movie, \
-    new_df_edges_rest_last_60_TR, new_df_edges_double_two_way, new_df_edges_rest_post_hoc, new_df_edges_combined
+    new_df_edges_rest_last_60_TR, new_df_edges_double_two_way, new_df_edges_rest_post_hoc, new_df_edges_combined, \
+    new_df_edges_everything
 from atlasTransform.atlasTransform.utils.atlas import load_shen_268
 from nilearn import plotting, datasets
 import nibabel
@@ -36,24 +37,37 @@ with open('./pickles/fc_dict.pickle', 'rb') as f:
         flattened_matrix = upper_triangle_flattened(value)
         df = pd.DataFrame(({'edges': edges, 'values': flattened_matrix}))
         fc_dict[key] = df
-#
-#     all_data = pd.concat(fc_dict, names=['key'])
-#     all_data.reset_index(inplace=True)
-#     pivoted_data = all_data.pivot(index='key', columns='edges', values='values')
-#
-#     edges_movie_awake = pivoted_data[pivoted_data.index.str.contains('movie_01_LPI')]
-#     edges_movie_mild = pivoted_data[pivoted_data.index.str.contains('movie_02_LPI')]
-#     edges_movie_deep = pivoted_data[pivoted_data.index.str.contains('movie_03_LPI')]
-#     edges_movie_recovery = pivoted_data[pivoted_data.index.str.contains('movie_04_LPI')]
-    # edges_rest_awake = pivoted_data[pivoted_data.index.str.contains('rest_01_LPI')]
-    # edges_rest_mild = pivoted_data[pivoted_data.index.str.contains('rest_02_LPI')]
-    # edges_rest_deep = pivoted_data[pivoted_data.index.str.contains('rest_03_LPI')]
-    # edges_rest_recovery = pivoted_data[pivoted_data.index.str.contains('rest_04_LPI')]
 
-    # edges_rest_awake_last_60_TR = pivoted_data[pivoted_data.index.str.contains('rest_01_LPI')]
-    # edges_rest_mild_last_60_TR = pivoted_data[pivoted_data.index.str.contains('rest_02_LPI')]
-    # edges_rest_deep_last_60_TR = pivoted_data[pivoted_data.index.str.contains('rest_03_LPI')]
-    # edges_rest_recovery_last_60_TR = pivoted_data[pivoted_data.index.str.contains('rest_04_LPI')]
+    all_data = pd.concat(fc_dict, names=['key'])
+    all_data.reset_index(inplace=True)
+    pivoted_data = all_data.pivot(index='key', columns='edges', values='values')
+
+    edges_movie_awake = pivoted_data[pivoted_data.index.str.contains('movie_01_LPI')]
+    edges_movie_mild = pivoted_data[pivoted_data.index.str.contains('movie_02_LPI')]
+    edges_movie_deep = pivoted_data[pivoted_data.index.str.contains('movie_03_LPI')]
+    edges_movie_recovery = pivoted_data[pivoted_data.index.str.contains('movie_04_LPI')]
+    edges_rest_awake = pivoted_data[pivoted_data.index.str.contains('rest_01_LPI')]
+    edges_rest_mild = pivoted_data[pivoted_data.index.str.contains('rest_02_LPI')]
+    edges_rest_deep = pivoted_data[pivoted_data.index.str.contains('rest_03_LPI')]
+    edges_rest_recovery = pivoted_data[pivoted_data.index.str.contains('rest_04_LPI')]
+
+with open('./pickles/fc_dict_last_60_TR.pickle', 'rb') as f:
+    fc_dict = pickle.load(f)
+
+    # for all the files in the dictionary, only keep the upper triangle
+    for key, value in fc_dict.items():
+        flattened_matrix = upper_triangle_flattened(value)
+        df = pd.DataFrame(({'edges': edges, 'values': flattened_matrix}))
+        fc_dict[key] = df
+
+    all_data = pd.concat(fc_dict, names=['key'])
+    all_data.reset_index(inplace=True)
+    pivoted_data = all_data.pivot(index='key', columns='edges', values='values')
+
+    edges_rest_awake_last_60_TR = pivoted_data[pivoted_data.index.str.contains('rest_01_LPI')]
+    edges_rest_mild_last_60_TR = pivoted_data[pivoted_data.index.str.contains('rest_02_LPI')]
+    edges_rest_deep_last_60_TR = pivoted_data[pivoted_data.index.str.contains('rest_03_LPI')]
+    edges_rest_recovery_last_60_TR = pivoted_data[pivoted_data.index.str.contains('rest_04_LPI')]
 
 # # only keep the edges if they are in the edges rest
 # edges_rest_awake_post_hoc = edges_rest_awake_last_60_TR[[col for col in edges_rest_awake_last_60_TR.columns if col in edges_rest]]
@@ -66,82 +80,50 @@ with open('./pickles/fc_dict.pickle', 'rb') as f:
 # # print(edges_rest_recovery_post_hoc.shape)
 
 
-def record_missing_edges(df_1, df_2, df_3, df_4, df_5=None):
+def record_missing_edges(*dfs):
+    # Initialize a list to track missing edges
     missing_edges = []
-    if df_3 is None and df_4 is None:
-        df_all = pd.concat([df_1, df_2])
-        for i, col in enumerate(df_all.columns):
-            if df_all[col].isnull().values.any():
-                missing_edges.append(i)
 
-        # now clean the data and return the cleaned data
-        df_all = df_all.dropna(axis=1, how='any')
-        # convert to absolute value
-        df_all = np.abs(df_all)
-        df_1 = df_all.iloc[:len(df_1), :]
-        df_2 = df_all.iloc[len(df_1):, :]
-        return df_1, df_2, missing_edges
-    if df_4 is None:
-        df_all = pd.concat([df_1, df_2, df_3])
-        for i, col in enumerate(df_all.columns):
-            if df_all[col].isnull().values.any():
-                missing_edges.append(i)
+    # Concatenate all dataframes passed to the function
+    df_all = pd.concat(dfs)
 
-        # now clean the data and return the cleaned data
-        df_all = df_all.dropna(axis=1, how='any')
-        # convert to absolute value
-        df_all = np.abs(df_all)
-        df_1 = df_all.iloc[:len(df_1), :]
-        df_2 = df_all.iloc[len(df_1):len(df_1) + len(df_2), :]
-        df_3 = df_all.iloc[len(df_1) + len(df_2):, :]
-        return df_1, df_2, df_3, missing_edges
-    if df_5 is not None:
-        df_all = pd.concat([df_1, df_2, df_3, df_4, df_5])
-        for i, col in enumerate(df_all.columns):
-            if df_all[col].isnull().values.any():
-                missing_edges.append(i)
+    # Identify columns with missing values
+    for i, col in enumerate(df_all.columns):
+        if df_all[col].isnull().values.any():
+            missing_edges.append(i)
 
-        # now clean the data and return the cleaned data
-        df_all = df_all.dropna(axis=1, how='any')
-        # convert to absolute value
-        df_all = np.abs(df_all)
-        df_1 = df_all.iloc[:len(df_1), :]
-        df_2 = df_all.iloc[len(df_1):len(df_1) + len(df_2), :]
-        df_3 = df_all.iloc[len(df_1) + len(df_2):len(df_1) + len(df_2) + len(df_3), :]
-        df_4 = df_all.iloc[len(df_1) + len(df_2) + len(df_3):len(df_1) + len(df_2) + len(df_3) + len(df_4), :]
-        df_5 = df_all.iloc[len(df_1) + len(df_2) + len(df_3) + len(df_4):, :]
-        return df_1, df_2, df_3, df_4, df_5, missing_edges
-    else:
-        df_all = pd.concat([df_1, df_2, df_3, df_4])
-        for i, col in enumerate(df_all.columns):
-            if df_all[col].isnull().values.any():
-                missing_edges.append(i)
+    # Clean the data: drop columns with any missing values and convert to absolute values
+    df_all = df_all.dropna(axis=1, how='any')
+    df_all = np.abs(df_all)
 
-        # now clean the data and return the cleaned data
-        df_all = df_all.dropna(axis=1, how='any')
-        # convert to absolute value
-        df_all = np.abs(df_all)
-        df_1 = df_all.iloc[:len(df_1), :]
-        df_2 = df_all.iloc[len(df_1):len(df_1) + len(df_2), :]
-        df_3 = df_all.iloc[len(df_1) + len(df_2):len(df_1) + len(df_2) + len(df_3), :]
-        df_4 = df_all.iloc[len(df_1) + len(df_2) + len(df_3):, :]
-        return df_1, df_2, df_3, df_4, missing_edges
+    # Split df_all back into individual dataframes based on original lengths
+    result_dfs = []
+    start_idx = 0
+    for df in dfs:
+        end_idx = start_idx + len(df)
+        # Slice df_all for each original dataframe's length
+        result_dfs.append(df_all.iloc[start_idx:end_idx, :])
+        start_idx = end_idx
 
+    # Return the cleaned dataframes and the list of columns with missing values before cleaning
+    return (*result_dfs, missing_edges)
 
 # edges_movie_awake_cleaned, edges_movie_mild_cleaned, edges_movie_deep_cleaned, edges_movie_recovery_cleaned, missing_edges_movie = record_missing_edges(
 #     edges_movie_awake, edges_movie_mild, edges_movie_deep, edges_movie_recovery)
 # edges_rest_awake_cleaned, edges_rest_mild_cleaned, edges_rest_deep_cleaned, edges_rest_recovery_cleaned, missing_edges_rest = record_missing_edges(
 #     edges_rest_awake, edges_rest_mild, edges_rest_deep, edges_rest_recovery)
 # edges_movie_awake_cleaned_1, edges_rest_awake_cleaned_1, missing_edges_effect_of_movie = record_missing_edges(
-#     edges_movie_awake, edges_rest_awake_last_60_TR, None, None)
+#     edges_movie_awake, edges_rest_awake_last_60_TR)
 # edges_rest_awake_last_60_TR_cleaned, edges_rest_mild_last_60_TR_cleaned, edges_rest_deep_last_60_TR_cleaned, edges_rest_recovery_last_60_TR_cleaned, missing_edges_rest_last_60_TR = record_missing_edges(
 #     edges_rest_awake_last_60_TR, edges_rest_mild_last_60_TR, edges_rest_deep_last_60_TR, edges_rest_recovery_last_60_TR)
 # edges_double_rest_awake_cleaned, edges_double_movie_mild_cleaned, edges_double_movie_deep_cleaned, missing_edges_double = record_missing_edges(
-#     edges_rest_awake_last_60_TR, edges_movie_mild, edges_movie_deep, None)
+#     edges_rest_awake_last_60_TR, edges_movie_mild, edges_movie_deep)
 # edges_rest_awake_post_hoc_cleaned, edges_rest_mild_post_hoc_cleaned, edges_rest_deep_post_hoc_cleaned, edges_rest_recovery_post_hoc_cleaned, missing_edges_rest_post_hoc = record_missing_edges(
 #     edges_rest_awake_post_hoc, edges_rest_mild_post_hoc, edges_rest_deep_post_hoc, edges_rest_recovery_post_hoc)
 # edges_rest_awake_combined_cleaned, edges_movie_awake_combined_cleaned, edges_movie_mild_combined_cleaned, edges_movie_deep_combined_cleaned, edges_movie_recovery_combined_cleaned, missing_edges_combined = record_missing_edges(
 #     edges_rest_awake_last_60_TR, edges_movie_awake, edges_movie_mild, edges_movie_deep, edges_movie_recovery)
+edges_movie_awake_everything, edges_movie_mild_everything, edges_movie_deep_everything, edges_movie_recovery_everything, edges_rest_awake_everything, edges_rest_mild_everything, edges_rest_deep_everything, edges_rest_recovery_everything, missing_edges_everything = record_missing_edges(
+    edges_movie_awake, edges_movie_mild, edges_movie_deep, edges_movie_recovery, edges_rest_awake_last_60_TR, edges_rest_mild_last_60_TR, edges_rest_deep_last_60_TR, edges_rest_recovery_last_60_TR)
 
 # # save the data
 # edges_movie_awake_cleaned.to_csv('./data_generated/edges_movie_awake.csv', index=False, header=False)
@@ -177,6 +159,15 @@ def record_missing_edges(df_1, df_2, df_3, df_4, df_5=None):
 # edges_movie_deep_combined_cleaned.to_csv('./data_generated/edges_movie_deep_combined.csv', index=False, header=False)
 # edges_movie_recovery_combined_cleaned.to_csv('./data_generated/edges_movie_recovery_combined.csv', index=False, header=False)
 
+# edges_movie_awake_everything.to_csv('./data_generated/edges_movie_awake_everything.csv', index=False, header=False)
+# edges_movie_mild_everything.to_csv('./data_generated/edges_movie_mild_everything.csv', index=False, header=False)
+# edges_movie_deep_everything.to_csv('./data_generated/edges_movie_deep_everything.csv', index=False, header=False)
+# edges_movie_recovery_everything.to_csv('./data_generated/edges_movie_recovery_everything.csv', index=False, header=False)
+# edges_rest_awake_everything.to_csv('./data_generated/edges_rest_awake_everything.csv', index=False, header=False)
+# edges_rest_mild_everything.to_csv('./data_generated/edges_rest_mild_everything.csv', index=False, header=False)
+# edges_rest_deep_everything.to_csv('./data_generated/edges_rest_deep_everything.csv', index=False, header=False)
+# edges_rest_recovery_everything.to_csv('./data_generated/edges_rest_recovery_everything.csv', index=False, header=False)
+
 # # save the missing edges
 # np.save('./data_generated/missing_edges_movie.npy', missing_edges_movie)
 # np.save('./data_generated/missing_edges_rest.npy', missing_edges_rest)
@@ -185,7 +176,7 @@ def record_missing_edges(df_1, df_2, df_3, df_4, df_5=None):
 # np.save('./data_generated/missing_edges_double.npy', missing_edges_double)
 # np.save('./data_generated/missing_edges_rest_post_hoc.npy', missing_edges_rest_post_hoc)
 # np.save('./data_generated/missing_edges_combined.npy', missing_edges_combined)
-
+# np.save('./data_generated/missing_edges_everything.npy', missing_edges_everything)
 
 def check_min_and_max(pd_series):
     min_value = pd_series.min()
@@ -203,31 +194,12 @@ def check_min_and_max(pd_series):
 # check_min_and_max(new_df_edges_combined_clean)
 
 
-def boxplot_the_mean(df_1, df_2, df_3, df_4, nodes_with_values):
-    if df_3 is None and df_4 is None:
-        df_1 = df_1.iloc[:, nodes_with_values].mean(axis=1)
-        df_2 = df_2.iloc[:, nodes_with_values].mean(axis=1)
-        plt.boxplot([df_1, df_2])
-        plt.xticks([1, 2], ['Rest', 'Narrative Listening'])
-        plt.ylabel('Mean of Functional Connectivity')
-        plt.xlabel('Sedation Level')
+def boxplot_the_mean(*dfs, nodes_with_values):
+    for df in dfs:
+        df = df[nodes_with_values]
+        df = df.mean(axis=1)
+        plt.boxplot(df)
         plt.show()
-
-        print('mean of df_1 is: ', df_1.mean())
-        print('mean of df_2 is: ', df_2.mean())
-
-    else:
-        df_1 = df_1.iloc[:, nodes_with_values].mean(axis=1)
-        df_2 = df_2.iloc[:, nodes_with_values].mean(axis=1)
-        df_3 = df_3.iloc[:, nodes_with_values].mean(axis=1)
-        df_4 = df_4.iloc[:, nodes_with_values].mean(axis=1)
-
-        plt.boxplot([df_1, df_2, df_3, df_4])
-        plt.xticks([1, 2, 3, 4], ['awake', 'mild', 'deep', 'recovery'])
-        plt.ylabel('Mean of Functional Connectivity')
-        plt.xlabel('Sedation Level')
-        plt.show()
-
 
 # boxplot_the_mean(edges_movie_awake, edges_movie_mild, edges_movie_deep, edges_movie_recovery, nodes_edges_movie)
 # boxplot_the_mean(edges_rest_awake, edges_rest_mild, edges_rest_deep, edges_rest_recovery, nodes_edges_rest)
@@ -257,7 +229,7 @@ def matrix_generator(new_df_edges):
     # fill all the nan values with 0
     matrix[np.isnan(matrix)] = 0
     # flip the sign of the matrix
-    matrix = -matrix
+    # matrix = -matrix
     return matrix
 
 
@@ -271,9 +243,9 @@ def matrix_generator(new_df_edges):
 # plt.savefig('./graphs/edges_movie_plot.png', dpi=650)
 # plt.show()
 
-plotting.plot_connectome(matrix_generator(new_df_edges_rest), coordinates, colorbar=True, node_size=0, edge_threshold="99.8%")
-plt.savefig('./graphs/edges_effect_of_propofol_plot.png', dpi=800)
-plt.show()
+# plotting.plot_connectome(matrix_generator(new_df_edges_rest), coordinates, colorbar=True, node_size=0, edge_threshold="99.8%")
+# plt.savefig('./graphs/edges_effect_of_propofol_plot.png', dpi=800)
+# plt.show()
 
 # plotting.plot_connectome(matrix_generator(new_df_edges_effect_of_movie), coordinates, colorbar=True, node_size=0, edge_threshold="99.8%")
 # plt.savefig('./graphs/edges_effect_of_movie_plot.png', dpi=650)
@@ -291,6 +263,10 @@ plt.show()
 
 # plotting.plot_connectome(matrix_generator(new_df_edges_combined), coordinates, colorbar=True, node_size=0, edge_threshold="99.8%")
 # plt.savefig('./graphs/edges_combined_effects_plot.png', dpi=650)
+# plt.show()
+
+# plotting.plot_connectome(matrix_generator(new_df_edges_everything), coordinates, colorbar=True, node_size=0, edge_threshold="99.7%")
+# plt.savefig('./graphs/edges_everything_plot.png', dpi=650)
 # plt.show()
 
 
