@@ -10,7 +10,8 @@ from nilearn.image import new_img_like
 from scipy.stats import stats, tukey_hsd, hypergeom
 from atlasTransform.atlasTransform.utils.atlas import load_shen_268
 from brain_plotting import hurst, hurst_movie_03, hurst_movie_02, hurst_movie_01_3, fc_movie, fc_rest, fc_movie_abs, \
-    hurst_last_60_TR, fc_double_two_way, fc_rest_last_60_TR, hurst_double_two_way, hurst_effect_of_movie, fc_effect_of_movie
+    hurst_last_60_TR, fc_double_two_way, fc_rest_last_60_TR, hurst_double_two_way, hurst_effect_of_movie, fc_effect_of_movie, \
+    hurst_everything, fc_everything, movie_new, rest_new, overlap_mask, fc_movie_new, fc_rest_new, fc_overlap_mask
 import scikit_posthocs as sp
 from statsmodels.stats.multitest import multipletests
 
@@ -18,21 +19,25 @@ from statsmodels.stats.multitest import multipletests
 def find_network(file_path: str, hurst=None, condition: str = None):
     node_numbers = np.load(file_path)  # load node numbers
     network_label = pd.read_csv('./atlasTransform/atlasTransform/data/shen_268/shen_268_parcellation_networklabels.csv')
-    # filter the network label DataFrame to only include rows for the specified node numbers
-    network_label_filtered = network_label[network_label['Node'].isin(node_numbers+1)]
     network_name = pd.read_csv('./atlasTransform/atlasTransform/data/shen_268/network_descriptions.csv')
+
+    # filter the network label DataFrame to only include rows for the specified node numbers
+    network_label_filtered = network_label[network_label['Node'].isin(node_numbers + 1)]
     network_label_filtered['Network'] = network_label_filtered['Network'].map(network_name.set_index('Network')['name'])
     print(network_label_filtered)
     # count the number of nodes in each network
     value_count = network_label_filtered['Network'].value_counts()
 
+    network_label['Network'] = network_label['Network'].map(network_name.set_index('Network')['name'])
+    # calculate how many nodes are in each network
+    total = network_label['Network'].value_counts().to_frame()
+
     # create a dictionary to store the p-values for each network
     p_values = {}
     # iterate through each network
     for network in value_count.index:
-        # calculate the p-value for the hypergeometric test
-        p = hypergeom.sf(value_count[network] - 1, len(network_label_filtered),
-                         len(network_label_filtered) - value_count[network], value_count[network])
+        p = hypergeom.sf(value_count[network] - 1, 268,
+                         total.loc[network].values[0], len(network_label_filtered))
         # store the p-value in the dictionary
         p_values[network] = p
     # correct the p-values using the Benjamini-Hochberg procedure
@@ -103,23 +108,26 @@ def find_network(file_path: str, hurst=None, condition: str = None):
     ax[0].bar(value_count.index, value_count.values)
     # ax[0].set_title('Number of Nodes in Each Network for ' + condition)
     # ax[0].set_xlabel('Network')
-    ax[0].set_ylabel('Number of Nodes')
+    ax[0].set_ylabel('Number of Nodes', fontsize=32)
     ax[0].yaxis.set_major_locator(MaxNLocator(integer=True))
+    # adjust y-axis ticks font size
+    ax[0].tick_params(axis='y', labelsize=32)
     ax[0].set_xticks(range(len(value_count.index)))
-    # ax[0].set_xticklabels([])
-    ax[0].set_xticklabels(rotation=45, ha='right', labels=value_count.index)
+    ax[0].set_xticklabels([])
+    # ax[0].set_xticklabels(rotation=45, ha='right', labels=value_count.index)
     fig.subplots_adjust(bottom=0.3)
     ax[1].bar(network_bl.index, network_bl.values)
     # manually code the order of the x-axis labels
     ax[1].set_xticks(range(len(value_count.index)))
     # ax[1].set_title('Mean Absolute Brain Loadings for Each Network for ' + condition)
     # ax[1].set_xlabel('Network')
-    ax[1].set_ylabel('Mean Absolute Brain Loadings')
+    ax[1].set_ylabel('Mean Absolute Brain Loadings', fontsize=32)
     ax[1].set_ylim(bottom=0.05)
+    ax[1].tick_params(axis='y', labelsize=32)
     # # set the number of ticks on the y-axis to start at 0.07 and end at 0.12
     # ax[1].yaxis.set_ticks(np.arange(0.05, 0.119, 0.01))# Set the x-ticks without labels
-    # ax[1].set_xticklabels([])
-    ax[1].set_xticklabels(rotation=45, ha='right', labels=network_bl.index)
+    ax[1].set_xticklabels([])
+    # ax[1].set_xticklabels(rotation=45, ha='right', labels=network_bl.index)
     fig.subplots_adjust(bottom=0.3)
     plt.savefig('./graphs/brain_loading_' + condition + '.png')
     plt.show()
@@ -135,21 +143,86 @@ def find_network(file_path: str, hurst=None, condition: str = None):
     return posthoc
 
 
-# posthoc_all = find_network('./data_generated/nodes_with_hurst_values.npy', hurst, 'Narrative Listening + Propofol - H')
+posthoc_all = find_network('./data_generated/nodes_with_hurst_values.npy', hurst, 'Narrative Listening + Propofol - H')
 # posthoc_mild = find_network('./data_generated/nodes_with_hurst_values_02.npy', hurst_movie_02, 'Mild Sedation')
 # posthoc_deep = find_network('./data_generated/nodes_with_hurst_values_03.npy', hurst_movie_03, 'Deep Sedation')
 # find_network('./data_generated/nodes_with_hurst_values_01_3.npy', hurst_movie_01_3, 'awake')
 # posthoc_rest = find_network('./data_generated/nodes_with_hurst_values_last_60_TR.npy', hurst_last_60_TR, 'Propofol - H')
 # posthoc_effect_of_movie = find_network('./data_generated/nodes_with_hurst_values_effect_of_movie.npy', hurst_effect_of_movie, 'Narrative Listening - H')
+# posthoc_everything = find_network('./data_generated/nodes_with_hurst_values_everything.npy', hurst_everything, 'Everything - H')
 
-#
-# posthoc_fc_movie = find_network('./data_generated/nodes_with_fc_values.npy', fc_movie, 'Narrative Listening + Propofol - FC')
+
+posthoc_fc_movie = find_network('./data_generated/nodes_with_fc_values.npy', fc_movie, 'Narrative Listening + Propofol - FC')
 # posthoc_fc_rest = find_network('./data_generated/nodes_with_fc_values_rest.npy', fc_rest, 'Resting State')
 # posthoc_fc_movie_abs = find_network('./data_generated/nodes_with_fc_values_abs.npy', fc_movie_abs, 'Narrative Listening')
 # posthoc_fc_double_two_way = find_network('./data_generated/nodes_with_fc_values_double_two_way.npy', fc_double_two_way, 'Propofol + Narrative Listening')
 # posthoc_fc_rest_last_60_TR = find_network('./data_generated/nodes_with_fc_values_rest_last_60_TR.npy', fc_rest_last_60_TR, 'Propofol - FC')
 # # posthoc_hurst_double_two_way = find_network('./data_generated/nodes_with_hurst_double_two_way.npy', hurst_double_two_way, 'Propofol + Narrative Listening')
 # posthoc_fc_effect_of_movie = find_network('./data_generated/nodes_with_fc_values_effect_of_movie.npy', fc_effect_of_movie, 'Narrative Listening - FC')
+# posthoc_fc_everything = find_network('./data_generated/nodes_with_fc_values_everything.npy', fc_everything, 'Everything - FC')
+
+
+# # do the same for some individual datasets
+# data = fc_rest_new
+# node_numbers = np.array([i for i, x in enumerate(data) if str(x) != 'nan'])
+# # node_numbers = np.array([i for i, x in enumerate(data) if x != 0])
+# network_label = pd.read_csv('./atlasTransform/atlasTransform/data/shen_268/shen_268_parcellation_networklabels.csv')
+# network_name = pd.read_csv('./atlasTransform/atlasTransform/data/shen_268/network_descriptions.csv')
+#
+# # filter the network label DataFrame to only include rows for the specified node numbers
+# network_label_filtered = network_label[network_label['Node'].isin(node_numbers+1)]
+# network_label_filtered['Network'] = network_label_filtered['Network'].map(network_name.set_index('Network')['name'])
+#
+# # count the number of nodes in each network
+# value_count = network_label_filtered['Network'].value_counts()
+#
+# network_label['Network'] = network_label['Network'].map(network_name.set_index('Network')['name'])
+# # calculate how many nodes are in each network
+# total = network_label['Network'].value_counts().to_frame()
+#
+# # create a dictionary to store the p-values for each network
+# p_values = {}
+# # iterate through each network
+# for network in value_count.index:
+#     p = hypergeom.sf(value_count[network] - 1, 268,
+#                     total.loc[network].values[0], len(network_label_filtered))
+#     # store the p-value in the dictionary
+#     p_values[network] = p
+# # correct the p-values using the Benjamini-Hochberg procedure
+# p_values_corrected = multipletests(list(p_values.values()), method='fdr_bh')[1]
+# # create a dictionary to store the corrected p-values for each network
+# p_values_corrected_dict = {}
+# # iterate through each network
+# for i in range(len(p_values_corrected)):
+#     # store the corrected p-value in the dictionary
+#     p_values_corrected_dict[list(p_values.keys())[i]] = p_values_corrected[i]
+# # create a dictionary to store the number of nodes in each network
+# network_node_count = {}
+# # iterate through each network
+# for network in value_count.index:
+#     # store the number of nodes in the network in the dictionary
+#     network_node_count[network] = value_count[network]
+# # create a dictionary to store the p-values and number of nodes in each network
+# network_p_values = {}
+# # iterate through each network
+# for network in value_count.index:
+#     # check if the denominator is zero
+#     denominator = len(network_label_filtered[network_label_filtered['Network'] == network])
+#     if denominator == 0:
+#         # set the p-value to NaN if the denominator is zero
+#         p_value = np.nan
+#     else:
+#         # get the corrected p-value from the dictionary
+#         p_value = p_values_corrected_dict[network]
+#     # store the p-value and number of nodes in the network in the dictionary
+#     network_p_values[network] = [p_value, network_node_count[network]]
+# # create a DataFrame from the dictionary
+# network_p_values_df = pd.DataFrame.from_dict(network_p_values, orient='index', columns=['p-value', 'Node Count'])
+# # sort the DataFrame by the p-values
+# network_p_values_df = network_p_values_df.sort_values(by=['p-value'])
+# # print the DataFrame
+# print(network_p_values_df)
+
 
 # # plot the atlas
 # atlas = load_shen_268(1)

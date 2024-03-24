@@ -11,6 +11,7 @@ from scipy.spatial.distance import cdist
 from plotting_preparation import (new_df, new_df_fc_movie, new_df_effect_of_movie, new_df_fc_effect_of_movie,
                                   new_df_rest_last_60_TR, new_df_fc_rest_last_60_TR,
                                   new_df_combined, new_df_fc_combined, new_df_fc_everything, new_df_movie_everything)
+from brain_plotting import overlap_mask, movie_new, rest_new
 from docx import Document
 
 # Load the shen parcellation
@@ -93,7 +94,64 @@ def single_z_score_table(df):
     return df_final
 
 
-def aggregated_z_score_table(df_hurst, df_fc, table_name):
+def aggregated_z_score_table(*dfs, table_name):
+
+    tables = []
+    for df in dfs:
+        table = single_z_score_table(df)
+        tables.append(table)
+
+    # Resetting index before concatenation
+    tables = [table.reset_index(drop=True) for table in tables]
+
+    table_final = pd.concat(tables, axis=1)
+
+    # export the mapping as a table
+    # Create a new Word Document
+    doc = Document()
+
+    # Add a table to the Word document
+    # The table will have df.shape[0] rows and df.shape[1] columns
+    table = doc.add_table(rows=table_final.shape[0] + 1, cols=table_final.shape[1])
+
+    # Insert the column names
+    for i, column in enumerate(table_final.columns):
+        table.cell(0, i).text = column
+
+    # Insert the values of dataframe
+    for i in range(table_final.shape[0]):
+        for j in range(table_final.shape[1]):
+            table.cell(i + 1, j).text = str(table_final.values[i, j])
+
+    # Save the doc
+    doc.save(table_name + '.docx')
+
+
+# aggregated_z_score_table(new_df, new_df_fc_movie, 'decoupled_z_score_table')
+# aggregated_z_score_table(new_df_effect_of_movie, new_df_fc_effect_of_movie, 'effect_of_movie_z_score_table')
+# aggregated_z_score_table(new_df_rest_last_60_TR, new_df_fc_rest_last_60_TR, 'effect_of_propofol_z_score_table')
+# aggregated_z_score_table(new_df_combined, new_df_fc_combined, 'combined_effect_z_score_table')
+# aggregated_z_score_table(new_df_movie_everything, new_df_fc_everything, 'movie_everything_z_score_table')
+
+# define a function to change the data format
+def change_format(list):
+    # change to dataframe
+    df = pd.DataFrame(list, columns=['u1'])
+    # add a column of boot_ratio
+    df['boot_ratio'] = 0
+
+    return df
+
+
+# change the format of the data
+df_hurst_effect_of_movie = change_format(movie_new)
+df_hurst_effect_of_propofol = change_format(rest_new)
+
+# create a table for the z-scores
+aggregated_z_score_table(df_hurst_effect_of_movie, df_hurst_effect_of_propofol, table_name='effect_of_movie_z_score_table1')
+
+
+def aggregated_z_score_table1(df_hurst, df_fc, table_name):
     hurst_table = single_z_score_table(df_hurst)
     fc_table = single_z_score_table(df_fc)
 
@@ -124,8 +182,5 @@ def aggregated_z_score_table(df_hurst, df_fc, table_name):
     doc.save(table_name + '.docx')
 
 
-# aggregated_z_score_table(new_df, new_df_fc_movie, 'decoupled_z_score_table')
-# aggregated_z_score_table(new_df_effect_of_movie, new_df_fc_effect_of_movie, 'effect_of_movie_z_score_table')
-# aggregated_z_score_table(new_df_rest_last_60_TR, new_df_fc_rest_last_60_TR, 'effect_of_propofol_z_score_table')
-# aggregated_z_score_table(new_df_combined, new_df_fc_combined, 'combined_effect_z_score_table')
-# aggregated_z_score_table(new_df_movie_everything, new_df_fc_everything, 'movie_everything_z_score_table')
+aggregated_z_score_table1(df_hurst_effect_of_movie, df_hurst_effect_of_propofol,
+                             table_name='effect_of_movie_z_score_table')

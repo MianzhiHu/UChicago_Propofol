@@ -9,13 +9,17 @@ nodes_hurst_combined = np.load('./data_generated/nodes_with_hurst_combined.npy')
 nodes_fc_combined = np.load('./data_generated/nodes_with_fc_values_combined.npy')
 nodes_hurst_nl = np.load('./data_generated/nodes_with_hurst_values.npy')
 nodes_fc_nl = np.load('./data_generated/nodes_with_fc_values.npy')
+nodes_hurst_everything = np.load('./data_generated/nodes_with_hurst_values_everything.npy')
+nodes_fc_everything = np.load('./data_generated/nodes_with_fc_values_everything.npy')
 
 
 def overlap_calculator(list1, list2):
     overlap = np.intersect1d(list1, list2)
-    percentage_overlap = len(overlap) / len(list1) * 100
+    print(f'overlap: {len(overlap)}')
+    percentage_overlap = len(overlap) / len(np.union1d(list1, list2)) * 100
     print(f'percentage overlap: {percentage_overlap}')
     return percentage_overlap
+    # return overlap
 
 
 
@@ -24,6 +28,10 @@ overlap_hurst_movie = overlap_calculator(nodes_hurst_combined, nodes_hurst_effec
 overlap_fc_movie = overlap_calculator(nodes_fc_effect_of_movie, nodes_fc_combined)
 overlap_hurst_propofol = overlap_calculator(nodes_hurst_effect_of_propofol, nodes_hurst_combined)
 overlap_fc_propofol = overlap_calculator(nodes_fc_effect_of_propofol, nodes_fc_combined)
+overlap_everything = overlap_calculator(nodes_fc_everything, nodes_hurst_everything)
+print(overlap_calculator(nodes_fc_everything, nodes_fc_nl))
+print(overlap_calculator(nodes_fc_effect_of_propofol, nodes_fc_nl))
+
 
 # calculate the union set of nodes
 union_nodes_hurst = np.union1d(nodes_hurst_effect_of_movie, nodes_hurst_effect_of_propofol)
@@ -82,9 +90,11 @@ pval_hurst_movie = hypergeometric_test(nodes_hurst_effect_of_movie, nodes_hurst_
 pval_fc_movie = hypergeometric_test(nodes_fc_effect_of_movie, nodes_fc_combined)
 pval_fc_between = hypergeometric_test(nodes_fc_effect_of_movie, nodes_fc_effect_of_propofol)
 pval_hurst_propofol = hypergeometric_test(nodes_hurst_effect_of_propofol, nodes_hurst_combined)
-pval_hurst_between = hypergeometric_test(nodes_hurst_effect_of_movie, nodes_hurst_effect_of_propofol)
+pval_hurst_between = hypergeometric_test(nodes_fc_effect_of_movie, nodes_fc_effect_of_propofol)
 pval_fc_propofol = hypergeometric_test(nodes_fc_effect_of_propofol, nodes_fc_combined)
 pval_x = hypergeometric_test(nodes_hurst_combined, union)
+pval_everything = hypergeometric_test(nodes_hurst_everything, nodes_fc_everything)
+print(hypergeometric_test(nodes_fc_effect_of_movie, nodes_fc_nl))
 
 for i in list_1:
     for j in list_2:

@@ -531,21 +531,13 @@ loadings = pd.concat([fc_everything_loadings, fc_effect_of_movie_loadings, fc_re
 
 # calculate the spearman correlation
 corr_everything = stats.spearmanr(loadings[:, 0], loadings[:, 5])
-print(f'Correlation between FC and Hurst for everything: {corr_everything}')
 corr_effect_of_movie = stats.spearmanr(loadings[:, 1], loadings[:, 6])
-print(f'Correlation between FC and Hurst for effect of movie: {corr_effect_of_movie}')
 corr_rest = stats.spearmanr(loadings[:, 2], loadings[:, 7])
-print(f'Correlation between FC and Hurst for rest: {corr_rest}')
 corr_combined = stats.spearmanr(loadings[:, 3], loadings[:, 8])
-print(f'Correlation between FC and Hurst for combined: {corr_combined}')
 corr_movie = stats.spearmanr(loadings[:, 4], loadings[:, 9])
-print(f'Correlation between FC and Hurst for movie: {corr_movie}')
 corr_fc_movie_versus_everything = stats.spearmanr(loadings[:, 4], loadings[:, 0])
-print(f'Correlation between FC movie and FC everything: {corr_fc_movie_versus_everything}')
 corr_hurst_movie_versus_everything = stats.spearmanr(loadings[:, 9], loadings[:, 5])
-print(f'Correlation between Hurst movie and Hurst everything: {corr_hurst_movie_versus_everything}')
 corr_fc_propofol_versus_everything = stats.spearmanr(loadings[:, 2], loadings[:, 0])
-print(f'Correlation between FC propofol and FC everything: {corr_fc_propofol_versus_everything}')
 
 # now, verify the results using the spin test
 # load the surrogates
@@ -553,6 +545,8 @@ fc_surrogates_movie = np.load('./data_generated/fc_surrogates_movie.npy')
 fc_surrogates_rest = np.load('./data_generated/fc_surrogates_rest.npy')
 fc_surrogates_effect_of_movie = np.load('./data_generated/fc_surrogates_effect_of_movie.npy')
 fc_surrogates_combined = np.load('./data_generated/fc_surrogates_combined.npy')
+fc_surrogates_everything = np.load('./data_generated/fc_surrogates_everything.npy')
+hurst_surrogates_everything = np.load('./data_generated/hurst_surrogates_everything.npy')
 
 # preallocate the lists
 pval_movie_surrogates = []
@@ -569,21 +563,16 @@ def spin_test_for_hurst_versus_fc(hurst, fc, surrogates, n, empty_pval_list):
     return corr, empty_pval_list
 
 
-corr_movie_surrogates, pval_movie_surrogates = spin_test_for_hurst_versus_fc(loadings[:, 0], loadings[:, 4],
-                                                                             fc_surrogates_movie, 10000,
-                                                                             pval_movie_surrogates)
-corr_rest_surrogates, pval_rest_surrogates = spin_test_for_hurst_versus_fc(loadings[:, 1], loadings[:, 5],
-                                                                           fc_surrogates_rest, 10000,
-                                                                           pval_rest_surrogates)
-corr_effect_of_movie_surrogates, pval_effect_of_movie_surrogates = spin_test_for_hurst_versus_fc(loadings[:, 2],
-                                                                                                 loadings[:, 6],
-                                                                                                 fc_surrogates_effect_of_movie,
-                                                                                                 10000,
-                                                                                                 pval_effect_of_movie_surrogates)
-corr_combined_surrogates, pval_combined_surrogates = spin_test_for_hurst_versus_fc(loadings[:, 3], loadings[:, 7],
-                                                                                      fc_surrogates_combined, 10000,
-                                                                                        [])
-corr_fc_effect_of_movie_vs_propofol_surrogates, pval_fc_effect_of_movie_vs_propofol_surrogates = spin_test_for_hurst_versus_fc(
-    loadings[:, 1], loadings[:, 2], fc_surrogates_effect_of_movie, 10000, [])
-corr_hurst_effect_of_movie_vs_propofol_surrogates, pval_hurst_effect_of_movie_vs_propofol_surrogates = spin_test_for_hurst_versus_fc(
-    loadings[:, 5], loadings[:, 6], fc_surrogates_effect_of_movie, 10000, [])
+# as a reminder
+# 0 - fc_everything
+# 1 - fc_effect_of_movie
+# 2 - fc_propofol
+# 3 - fc_combined
+# 4 - fc_interaction
+# 5 - hurst_everything
+# 6 - hurst_effect_of_movie
+# 7 - hurst_propofol
+# 8 - hurst_combined
+# 9 - hurst_interaction
+
+c, p = spin_test_for_hurst_versus_fc(loadings[:, 4], loadings[:, 9], fc_surrogates_movie, 10000, [])

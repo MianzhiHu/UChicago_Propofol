@@ -347,8 +347,10 @@ print(f'term surrogates deep pls file done: {term_sur_file_deep_pls}')
 
 distance_mat_fc = np.load('./data_generated/shen_distance_fc.npy')
 lv_val_fc_everything = loadings[:, 0]
+lv_val_hurst_everything = loadings[:, 5]
 # surrogate_generator(lv_val_movie, distance_mat_fc, 'fc_surrogates_movie.npy')
 # surrogate_generator(lv_val_rest, distance_mat_fc, 'fc_surrogates_rest.npy')
 # surrogate_generator(lv_val_effect_of_movie, distance_mat_fc, 'fc_surrogates_effect_of_movie.npy')
 # surrogate_generator(lv_val_combined, distance_mat_fc, 'fc_surrogates_combined.npy')
 # surrogate_generator(lv_val_fc_everything, distance_mat_fc, 'fc_surrogates_everything.npy')
+# surrogate_generator(lv_val_hurst_everything, distance_mat_fc, 'hurst_surrogates_everything.npy')

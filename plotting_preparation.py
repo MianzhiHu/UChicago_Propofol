@@ -190,6 +190,13 @@ new_df_edges_everything = plot_preparation(edges_lv_vals_everything, edges_boot_
 
 hurst_effect_of_movie_full = plot_preparation(lv_vals_effect_of_movie, boot_ratio_effect_of_movie, effect_of_movie_nan,
                                               keep=True)
+hurst_rest_full = plot_preparation(lv_vals_rest_last_60_TR, boot_ratio_rest_last_60_TR, df_last_60_TR_missing,
+                                      keep=True)
+fc_effect_of_movie_full = plot_preparation(fc_lv_vals_effect_of_movie, fc_boot_ratio_effect_of_movie,
+                                             fc_effect_of_movie_nan, keep=True)
+fc_rest_full = plot_preparation(fc_lv_vals_rest_last_60_TR, fc_boot_ratio_rest_last_60_TR, fc_rest_last_60_TR_nan,
+                                    keep=True)
+
 
 def plot_preparation_for_2ndLV(lv_vals, boot_ratio, nodes_with_missing_values):
     # get the data with only the first column

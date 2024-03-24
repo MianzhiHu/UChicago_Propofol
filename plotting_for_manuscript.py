@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-from scipy.stats import gaussian_kde
+from scipy.stats import gaussian_kde, pearsonr
 import turtle
 import pickle
 from scipy.signal import welch
@@ -282,11 +282,20 @@ with open('./pickles/outcome_268.pickle', 'rb') as f:
         r_squared_values = np.vstack(r_squared)
 
 # # load the data
-# example_high = np.load('./data_clean/02CB_01_rest_01_LPI_000.npy')
-# example_high = example_high[4,:]
-#
-# example_low = np.load('./data_clean/02CB_01_rest_03_LPI_000.npy')
-# example_low = example_low[2,:]
+example_high = np.load('./data_clean/02CB_01_rest_01_LPI_000.npy')
+example_high1 = example_high[0,:]
+example_high2 = example_high[4,:]
+
+# print(pearsonr(example_high1, example_high2))
+
+
+example_low = np.load('./data_clean/02CB_01_rest_03_LPI_000.npy')
+example_low = example_low[2,:]
+
+example_low1 = example_high[263, :]
+example_low2 = example_high[243, :]
+
+print(pearsonr(example_low2, example_low1))
 
 
 # Function to plot Welch's power spectral density estimate
@@ -302,9 +311,12 @@ def plot_welch_spectrum(time_series, title):
     plt.show()
 
 # # plot the Welch's power spectral density estimate for the high and low Hurst time series
-# plot_welch_spectrum(example_high, 'Power Spectral Density Estimate for High Hurst Time Series')
+plot_welch_spectrum(example_high1, 'Power Spectral Density Estimate for High Hurst Time Series')
 # plot_welch_spectrum(example_low, 'Power Spectral Density Estimate for Low Hurst Time Series')
-#
+plot_welch_spectrum(example_high2, 'Power Spectral Density Estimate for High Hurst Time Series')
+plot_welch_spectrum(example_low1, 'Power Spectral Density Estimate for Low Hurst Time Series')
+plot_welch_spectrum(example_low2, 'Power Spectral Density Estimate for Low Hurst Time Series')
+
 #
 # # plot example_high and example_low as subplots
 # fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(10, 8), dpi=160)
@@ -319,6 +331,25 @@ def plot_welch_spectrum(time_series, title):
 # # in the lower subplot, add a text
 # ax2.text(0.05, 0.05, 'Hurst = 0.50', fontsize=11, color='black', transform=ax2.transAxes)
 # plt.show()
+
+# plot example_high and example_high1 in the same plot
+plt.plot(example_high1, color='red', label='High Hurst Time Series')
+plt.plot(example_high2, color='blue', label='High Hurst Time Series 1')
+plt.xlabel('Time', fontsize=13)
+plt.ylabel('Amplitude', fontsize=13)
+plt.title('Example High Hurst Time Series')
+plt.legend()
+plt.savefig('./graphs/h-fc.png', dpi=650)
+plt.show()
+
+plt.plot(example_low1, color='red', label='Low Hurst Time Series')
+plt.plot(example_low2, color='blue', label='Low Hurst Time Series 1')
+plt.xlabel('Time', fontsize=13)
+plt.ylabel('Amplitude', fontsize=13)
+plt.title('Example Low Hurst Time Series')
+plt.legend()
+plt.savefig('./graphs/l-fc.png', dpi=650)
+plt.show()
 
 
 # draw the Sierpinski triangle example
@@ -396,9 +427,33 @@ def draw_sierpinski_line_improved_light_gray(vertices, depth, ax, level=0):
 # plt.show()
 
 
-# plotting for figure 2
-# Plot a blank glass brain
-plotting.plot_glass_brain(None, display_mode='r')
+# # plotting for figure 2
+# # Plot a blank glass brain
+# plotting.plot_glass_brain(None, display_mode='r')
+#
+# # Show the plot
+# plotting.show()
 
-# Show the plot
-plotting.show()
+# to illustrate our point, I need to simulate a highly stereotyped, repetitive, and predictable time series
+# I will use a sine wave to illustrate this point
+time = np.arange(0, 100, 1)
+
+# generate 500 sine waves with random phase shifts
+sine_waves = [np.sin(time + np.random.uniform(0, 2 * np.pi)) for _ in range(1000)]
+
+import random
+# randomly select 500 sine waves
+random_sine_waves = random.sample(sine_waves, 500)
+mean_sine_wave = np.mean(random_sine_waves, axis=0)
+
+# pick the other half of the sine waves
+random_sine_waves_2 = random.sample(sine_waves, 500)
+mean_sine_wave_2 = np.mean(random_sine_waves_2, axis=0)
+
+# plot the sine waves together with the mean sine wave
+plt.plot(time, mean_sine_wave, label='Mean Sine Wave')
+plt.plot(time, mean_sine_wave_2, label='Mean Sine Wave 2')
+plt.legend()
+plt.show()
+
+

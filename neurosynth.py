@@ -12,9 +12,11 @@ import numpy as np
 from nilearn.plotting import plot_roi,view_img_on_surf, view_markers,view_img,view_connectome, find_parcellation_cut_coords,plot_stat_map
 from statsmodels.stats.multitest import multipletests
 from plotting_preparation import df_movie_missing, df_03_missing, df_02_missing, df_01_missing, df_everything_missing, \
-    df_03_30_missing, df_last_60_TR_missing, effect_of_movie_nan, df_combined_missing
+    df_03_30_missing, df_last_60_TR_missing, effect_of_movie_nan, df_combined_missing, new_df_effect_of_movie, \
+    new_df
 from matplotlib.patches import Ellipse
 import pandas as pd
+from brain_plotting import overlap_mask, movie_new, rest_new
 
 n = 10000
 
@@ -51,21 +53,32 @@ for i in nan_columns:
 window_0_deep = window_0_deep.to_numpy()
 
 
-def neurosynth_hurst(file_path, kept_terms_maps, term_surrogates, p_value, df_movie_missing):
-    lv_vals = sio.loadmat(file_path)
-    hurst = lv_vals['u1'][:, 0]
-    # reverse sign of hurst
-    hurst = [-x for x in hurst]
-    hurst = np.array(hurst)
-    # convert to boolean
-    missing_columns = np.isin(np.arange(kept_terms_maps.shape[1]), df_movie_missing)
-    # print(missing_columns)
+def neurosynth_hurst(file_path, kept_terms_maps, term_surrogates, p_value, df_movie_missing,
+                     option='keep'):
 
-    # remove nodes with missing values from kept_terms_maps
-    kept_terms_maps = kept_terms_maps[:, ~missing_columns]
+    if option == 'keep':
+        lv_vals = sio.loadmat(file_path)
+        hurst = lv_vals['u1'][:, 0]
+        # reverse sign of hurst
+        hurst = [-x for x in hurst]
+        hurst = np.array(hurst)
 
-    # remove nodes with missing values from term_surrogates
-    term_surrogates = term_surrogates[:, ~missing_columns]
+        # convert to boolean
+        missing_columns = np.isin(np.arange(kept_terms_maps.shape[1]), df_movie_missing)
+        # print(missing_columns)
+
+        # remove nodes with missing values from kept_terms_maps
+        kept_terms_maps = kept_terms_maps[:, ~missing_columns]
+
+        # remove nodes with missing values from term_surrogates
+        term_surrogates = term_surrogates[:, ~missing_columns]
+
+    if option == 'remove':
+        # in this case, the file_path should just be a df
+        hurst = file_path['u1']
+        # convert nan to 0
+        hurst = np.nan_to_num(hurst)
+        hurst = np.array([-x for x in hurst])
 
     og_term_corrs = spearmanr(kept_terms_maps, hurst).flatten()
     pvals = np.vstack([(np.abs(og_term_corrs[i])<np.abs(spearmanr(hurst, term_surrogates[i*n:(i+1)*n, :]))).sum()/n for i in range(kept_terms_maps.shape[0])])
@@ -123,24 +136,52 @@ def neurosynth_hurst(file_path, kept_terms_maps, term_surrogates, p_value, df_mo
 
 
 
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLShurst_propofol_movie_lv_vals.mat',kept_terms_maps, term_surrogates, 0.01, df_movie_missing)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLSmovie_03_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, df_03_missing)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLSmovie_03_30_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, df_03_30_missing)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLSmovie_02_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, df_02_missing)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLSmovie_1_3_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, df_01_missing)
-neurosynth_hurst('./data_generated/PLS_outputTaskPLSeverything_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, df_everything_missing)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_everything_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, fc_all_nan)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_movie_abs_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, fc_movie_nan)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_movie_lv_vals.mat', kept_terms_maps,term_surrogates, 0.01, fc_movie_nan)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_rest_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, fc_rest_nan)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLSlast_60_TR_lv_vals.mat', kept_terms_maps,term_surrogates, 0.01, df_last_60_TR_missing)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_rest_last_60_TR_lv_vals.mat', kept_terms_maps,term_surrogates, 0.01, fc_rest_nan_last_60_TR)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLSeffect_of_movie_lv_vals.mat', kept_terms_maps,term_surrogates, 0.01, effect_of_movie_nan)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_effect_of_movie_lv_vals.mat', kept_terms_maps,term_surrogates, 0.01, fc_effect_of_movie_nan)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLStwo-way double_lv_vals.mat', kept_terms_maps, term_surrogates, 0.01, double_nan)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_double_two_way_lv_vals.mat', kept_terms_maps, term_surrogates, 0.01, fc_double_nan)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLScombined_lv_vals.mat', kept_terms_maps, term_surrogates, 0.01, df_combined_missing)
-# neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_combined_lv_vals.mat', kept_terms_maps, term_surrogates, 0.01, fc_combined_nan)
+if __name__ == '__main__':
+    neurosynth_hurst('./data_generated/PLS_outputTaskPLShurst_propofol_movie_lv_vals.mat',kept_terms_maps, term_surrogates, 0.01, df_movie_missing)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLSmovie_03_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, df_03_missing)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLSmovie_03_30_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, df_03_30_missing)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLSmovie_02_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, df_02_missing)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLSmovie_1_3_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, df_01_missing)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLSeverything_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, df_everything_missing)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_everything_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, fc_all_nan)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_movie_abs_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, fc_movie_nan)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_movie_lv_vals.mat', kept_terms_maps,term_surrogates, 0.01, fc_movie_nan)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_rest_lv_vals.mat',kept_terms_maps,term_surrogates, 0.01, fc_rest_nan)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLSlast_60_TR_lv_vals.mat', kept_terms_maps,term_surrogates, 0.01, df_last_60_TR_missing)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_rest_last_60_TR_lv_vals.mat', kept_terms_maps,term_surrogates, 0.01, fc_rest_nan_last_60_TR)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLSeffect_of_movie_lv_vals.mat', kept_terms_maps,term_surrogates, 0.01, effect_of_movie_nan)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_effect_of_movie_lv_vals.mat', kept_terms_maps,term_surrogates, 0.01, fc_effect_of_movie_nan)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLStwo-way double_lv_vals.mat', kept_terms_maps, term_surrogates, 0.01, double_nan)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_double_two_way_lv_vals.mat', kept_terms_maps, term_surrogates, 0.01, fc_double_nan)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLScombined_lv_vals.mat', kept_terms_maps, term_surrogates, 0.01, df_combined_missing)
+    # neurosynth_hurst('./data_generated/PLS_outputTaskPLSfc_combined_lv_vals.mat', kept_terms_maps, term_surrogates, 0.01, fc_combined_nan)
+
+    # remove
+    # neurosynth_hurst(new_df_effect_of_movie, kept_terms_maps, term_surrogates, 0.01, df_movie_missing, option='remove')
+    # p = neurosynth_hurst(new_df, kept_terms_maps, term_surrogates, 0.01, df_movie_missing, option='remove')
+
+    # overlap_mask = np.array(overlap_mask)
+    # movie_new = np.array(movie_new)
+    # movie_new = np.nan_to_num(movie_new)
+    # rest_new = np.array(rest_new)
+    # rest_new = np.nan_to_num(rest_new)
+    #
+    # for data in [overlap_mask, movie_new, rest_new]:
+    #     og_term_corrs = spearmanr(kept_terms_maps, data).flatten()
+    #     pvals = np.vstack([(np.abs(og_term_corrs[i])<np.abs(spearmanr(data, term_surrogates[i*n:(i+1)*n, :]))).sum()/n for i in range(kept_terms_maps.shape[0])])
+    #     pvals = np.hstack([max(x, 1/n) for x in pvals])
+    #     pvals[np.isnan(og_term_corrs)] = 1.
+    #
+    #     discoveries = multipletests(pvals, method='fdr_bh', alpha=.05)[0]
+    #     discovery_terms = kept_terms[discoveries]
+    #     print(discovery_terms)
+    #     discovery_corrs = og_term_corrs[discoveries]
+    #     print(discovery_corrs)
+
+
+
+
+
 
 # # compute the correlation between the first loadings and the rest of the loadings
 # # load the matrix
