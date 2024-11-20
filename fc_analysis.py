@@ -9,7 +9,6 @@ from plotting_preparation import (fc_lv_vals_movie, fc_lv_vals_rest, \
     df_movie_missing, df_last_60_TR_missing, effect_of_movie_nan, fc_lv_vals_effect_of_movie, \
     fc_effect_of_movie_nan, fc_lv_vals_rest_last_60_TR, fc_lv_vals_combined, lv_vals_combined, fc_lv_vals_everything, \
     lv_vals_movie_everything)
-
 from brainsmash.mapgen.stats import spearmanr
 from sklearn.linear_model import LinearRegression
 import statsmodels.api as sm
@@ -575,4 +574,5 @@ def spin_test_for_hurst_versus_fc(hurst, fc, surrogates, n, empty_pval_list):
 # 8 - hurst_combined
 # 9 - hurst_interaction
 
-c, p = spin_test_for_hurst_versus_fc(loadings[:, 4], loadings[:, 9], fc_surrogates_movie, 10000, [])
+c, p = spin_test_for_hurst_versus_fc(loadings[:, 6], loadings[:, 0], fc_surrogates_everything, 10000, [])
+print(f'corr: {c}, p: {p}')

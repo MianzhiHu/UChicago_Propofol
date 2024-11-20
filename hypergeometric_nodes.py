@@ -29,8 +29,8 @@ overlap_fc_movie = overlap_calculator(nodes_fc_effect_of_movie, nodes_fc_combine
 overlap_hurst_propofol = overlap_calculator(nodes_hurst_effect_of_propofol, nodes_hurst_combined)
 overlap_fc_propofol = overlap_calculator(nodes_fc_effect_of_propofol, nodes_fc_combined)
 overlap_everything = overlap_calculator(nodes_fc_everything, nodes_hurst_everything)
-print(overlap_calculator(nodes_fc_everything, nodes_fc_nl))
-print(overlap_calculator(nodes_fc_effect_of_propofol, nodes_fc_nl))
+print(overlap_calculator(nodes_fc_effect_of_movie, nodes_hurst_everything))
+print(overlap_calculator(nodes_hurst_effect_of_movie, nodes_fc_everything))
 
 
 # calculate the union set of nodes
@@ -95,6 +95,7 @@ pval_fc_propofol = hypergeometric_test(nodes_fc_effect_of_propofol, nodes_fc_com
 pval_x = hypergeometric_test(nodes_hurst_combined, union)
 pval_everything = hypergeometric_test(nodes_hurst_everything, nodes_fc_everything)
 print(hypergeometric_test(nodes_fc_effect_of_movie, nodes_fc_nl))
+print(hypergeometric_test(nodes_hurst_effect_of_movie, nodes_fc_everything))
 
 for i in list_1:
     for j in list_2:
