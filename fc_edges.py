@@ -30,6 +30,64 @@ nodes = np.union1d(hurst_nodes_rest, fc_nodes_rest)
 edges_rest = [(nodes[i], nodes[j]) for i in range(len(nodes)) for j in range(i + 1, len(nodes))]
 
 with open('./pickles/fc_dict.pickle', 'rb') as f:
+    general_fc = pickle.load(f)
+    for key, value in general_fc.items():
+        # exclude the diagonal
+        df = np.where(value == 2.0, np.nan, value)
+        # calculate the average FC
+        average = np.nanmean(df, axis=0)
+        general_fc[key] = average
+
+    all_general_fc = pd.DataFrame(general_fc).transpose()
+
+with open('./pickles/fc_dict_last_60_TR.pickle', 'rb') as f:
+    general_rest_fc = pickle.load(f)
+    for key, value in general_rest_fc .items():
+        # exclude the diagonal
+        df = np.where(value == 2.0, np.nan, value)
+        # calculate the average FC
+        average = np.nanmean(df, axis=0)
+        general_rest_fc [key] = average
+
+    all_general_rest_fc = pd.DataFrame(general_rest_fc).transpose()
+
+# remove columns that contain NaN and record the missing nodes
+missing_nodes = all_general_fc.columns[all_general_fc.isnull().any()].tolist()
+missing_nodes_last_60 = all_general_fc.columns[all_general_fc.isnull().any()].tolist()
+missing_nodes_total = np.union1d(missing_nodes, missing_nodes_last_60)
+
+# drop the missing nodes by column index
+all_general_fc = all_general_fc.drop(columns=missing_nodes)
+all_general_rest_fc = all_general_rest_fc.drop(columns=missing_nodes_last_60)
+
+# take absolute values
+all_general_fc = np.abs(all_general_fc)
+all_general_rest_fc = np.abs(all_general_rest_fc)
+
+general_fc_movie_awake = all_general_fc[all_general_fc.index.str.contains('movie_01_LPI')]
+general_fc_movie_mild = all_general_fc[all_general_fc.index.str.contains('movie_02_LPI')]
+general_fc_movie_deep = all_general_fc[all_general_fc.index.str.contains('movie_03_LPI')]
+general_fc_movie_recovery = all_general_fc[all_general_fc.index.str.contains('movie_04_LPI')]
+general_fc_rest_awake = all_general_rest_fc[all_general_rest_fc.index.str.contains('rest_01_LPI')]
+general_fc_rest_mild = all_general_rest_fc[all_general_rest_fc.index.str.contains('rest_02_LPI')]
+general_fc_rest_deep = all_general_rest_fc[all_general_rest_fc.index.str.contains('rest_03_LPI')]
+general_fc_rest_recovery = all_general_rest_fc[all_general_rest_fc.index.str.contains('rest_04_LPI')]
+
+# save the data
+general_fc_movie_awake.to_csv('./data_generated/general_fc_movie_awake.csv', index=False, header=False)
+general_fc_movie_mild.to_csv('./data_generated/general_fc_movie_mild.csv', index=False, header=False)
+general_fc_movie_deep.to_csv('./data_generated/general_fc_movie_deep.csv', index=False, header=False)
+general_fc_movie_recovery.to_csv('./data_generated/general_fc_movie_recovery.csv', index=False, header=False)
+general_fc_rest_awake.to_csv('./data_generated/general_fc_rest_awake.csv', index=False, header=False)
+general_fc_rest_mild.to_csv('./data_generated/general_fc_rest_mild.csv', index=False, header=False)
+general_fc_rest_deep.to_csv('./data_generated/general_fc_rest_deep.csv', index=False, header=False)
+general_fc_rest_recovery.to_csv('./data_generated/general_fc_rest_recovery.csv', index=False, header=False)
+general_fc_missing_nodes = np.save('./data_generated/general_fc_missing_nodes.npy', missing_nodes_total)
+
+
+
+
+with open('./pickles/fc_dict.pickle', 'rb') as f:
     fc_dict = pickle.load(f)
 
     # for all the files in the dictionary, only keep the upper triangle

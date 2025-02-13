@@ -283,20 +283,10 @@ with open('./pickles/outcome_268.pickle', 'rb') as f:
 
 # # load the data
 example_high = np.load('./data_clean/02CB_01_rest_01_LPI_000.npy')
-example_high1 = example_high[0,:]
-example_high2 = example_high[4,:]
-
-# print(pearsonr(example_high1, example_high2))
-
+example_high = example_high[4,:]
 
 example_low = np.load('./data_clean/02CB_01_rest_03_LPI_000.npy')
 example_low = example_low[2,:]
-
-example_low1 = example_high[263, :]
-example_low2 = example_high[243, :]
-
-print(pearsonr(example_low2, example_low1))
-
 
 # Function to plot Welch's power spectral density estimate
 def plot_welch_spectrum(time_series, title):
@@ -305,52 +295,35 @@ def plot_welch_spectrum(time_series, title):
         freqs, powers = welch(time_series, nperseg=nperseg)
         plt.plot(freqs, powers, label=f'Window size: {nperseg}s')
     plt.title(title)
-    plt.xlabel('Frequency (Hz)')
-    plt.ylabel('Power')
-    plt.legend()
+    plt.xlabel('Frequency (Hz)', fontsize=20)
+    plt.ylabel('Power', fontsize=20)
+    plt.legend(fontsize=15)
+    plt.tick_params(axis='both', which='major', labelsize=20)
+    for axis in ['top', 'right']:
+        plt.gca().spines[axis].set_linewidth(0)
+    plt.tight_layout()
+    plt.savefig('./graphs/welch_spectrum.png', dpi=650)
     plt.show()
 
 # # plot the Welch's power spectral density estimate for the high and low Hurst time series
-plot_welch_spectrum(example_high1, 'Power Spectral Density Estimate for High Hurst Time Series')
-# plot_welch_spectrum(example_low, 'Power Spectral Density Estimate for Low Hurst Time Series')
-plot_welch_spectrum(example_high2, 'Power Spectral Density Estimate for High Hurst Time Series')
-plot_welch_spectrum(example_low1, 'Power Spectral Density Estimate for Low Hurst Time Series')
-plot_welch_spectrum(example_low2, 'Power Spectral Density Estimate for Low Hurst Time Series')
+plot_welch_spectrum(example_high, '')
+plot_welch_spectrum(example_low, '')
 
-#
-# # plot example_high and example_low as subplots
-# fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, figsize=(10, 8), dpi=160)
-# plt.xlim(-2, 255)
-# plt.xlabel('Time', fontsize=13)
-# ax1.plot(example_high, color='red')
-# ax1.set_title('Example High Hurst Time Series')
-# ax2.plot(example_low, color='blue')
-# ax2.set_title('Example Low Hurst Time Series')
-# # in the upper subplot, add a text
-# ax1.text(0.05, 0.05, 'Hurst = 0.96', fontsize=11, color='black', transform=ax1.transAxes)
-# # in the lower subplot, add a text
-# ax2.text(0.05, 0.05, 'Hurst = 0.50', fontsize=11, color='black', transform=ax2.transAxes)
-# plt.show()
-
-# plot example_high and example_high1 in the same plot
-plt.plot(example_high1, color='red', label='High Hurst Time Series')
-plt.plot(example_high2, color='blue', label='High Hurst Time Series 1')
-plt.xlabel('Time', fontsize=13)
-plt.ylabel('Amplitude', fontsize=13)
-plt.title('Example High Hurst Time Series')
-plt.legend()
-plt.savefig('./graphs/h-fc.png', dpi=650)
+# plot example_high and example_low as subplots
+fig, (ax1, ax2) = plt.subplots(2, 1, sharex=True, sharey=True, figsize=(10, 10), dpi=650)
+plt.xlim(-2, 255)
+plt.xlabel('Time', fontsize=20)
+ax1.plot(example_high, color='red')
+ax1.set_title('Example High Hurst Time Series', fontsize=30)
+ax2.plot(example_low, color='blue')
+ax2.set_title('Example Low Hurst Time Series', fontsize=30)
+ax1.text(0.05, 0.05, 'Hurst = 0.96', fontsize=20, color='black', transform=ax1.transAxes)
+ax2.text(0.05, 0.05, 'Hurst = 0.50', fontsize=20, color='black', transform=ax2.transAxes)
+ax1.tick_params(axis='both', which='major', labelsize=20)
+ax2.tick_params(axis='both', which='major', labelsize=20)
+plt.tight_layout()
+plt.savefig('./graphs/example_high.png', dpi=650)
 plt.show()
-
-plt.plot(example_low1, color='red', label='Low Hurst Time Series')
-plt.plot(example_low2, color='blue', label='Low Hurst Time Series 1')
-plt.xlabel('Time', fontsize=13)
-plt.ylabel('Amplitude', fontsize=13)
-plt.title('Example Low Hurst Time Series')
-plt.legend()
-plt.savefig('./graphs/l-fc.png', dpi=650)
-plt.show()
-
 
 # draw the Sierpinski triangle example
 def draw_sierpinski_triangle_specific_section(vertices, depth, ax, target_depth, current_depth=0):

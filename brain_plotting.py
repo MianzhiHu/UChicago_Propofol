@@ -9,7 +9,8 @@ from plotting_preparation import new_df, new_df_movie_03, new_df_movie_02, new_d
     new_df_fc_effect_of_movie, new_df_rest_last_60_TR, new_df_effect_of_movie, new_df_fc_rest_last_60_TR, \
     new_df_double_three_way, new_df_double_two_way, new_df_double_merged, new_df_fc_double_three_way, \
     new_df_fc_double_two_way, new_df_fc_double_merged, new_df_combined, new_df_fc_combined, new_df_fc_everything, \
-    hurst_effect_of_movie_full, hurst_rest_full, fc_rest_full, fc_effect_of_movie_full
+    hurst_effect_of_movie_full, hurst_rest_full, fc_rest_full, fc_effect_of_movie_full, general_fc_everything, \
+    general_fc_movie
 from make_side_by_side_surf_plots import make_side_by_side_surf_plots, make_side_by_side_surf_plots_left
 import pandas as pd
 
@@ -43,6 +44,9 @@ fc_combined = new_df_fc_combined.iloc[:, 0].tolist()
 fc_everything = new_df_fc_everything.iloc[:, 0].tolist()
 fc_effect_of_movie_full = fc_effect_of_movie_full.iloc[:, 0].tolist()
 fc_rest_full = fc_rest_full.iloc[:, 0].tolist()
+
+general_fc_everything = general_fc_everything.iloc[:, 0].tolist()
+general_fc_movie = general_fc_movie.iloc[:, 0].tolist()
 
 # # save the node numbers where the hurst values are not NaN
 # nodes_with_hurst_values = [i for i, x in enumerate(hurst) if str(x) != 'nan']
@@ -90,10 +94,10 @@ fc_rest_full = fc_rest_full.iloc[:, 0].tolist()
 
 
 # check the range of the hurst values discarding NaN values
-print(min([x for x in hurst_effect_of_movie_full if str(x) != 'nan']))
-print(max([x for x in hurst_effect_of_movie_full if str(x) != 'nan']))
-
-
+df_of_interest = general_fc_movie
+print(min([x for x in df_of_interest if str(x) != 'nan']))
+print(max([x for x in df_of_interest if str(x) != 'nan']))
+print(len([x for x in df_of_interest if str(x) != 'nan']))
 
 # convert the list to negative values
 hurst = [-x for x in hurst]
@@ -117,6 +121,9 @@ fc_effect_of_movie = [-x for x in fc_effect_of_movie]
 fc_combined = [-x for x in fc_combined]
 fc_everything = [-x for x in fc_everything]
 fc_effect_of_movie_full = [-x for x in fc_effect_of_movie_full]
+
+general_fc_everything = [-x for x in general_fc_everything]
+general_fc_movie = [-x for x in general_fc_movie]
 
 for data in [hurst_effect_of_movie_full, hurst_rest_full, fc_rest_full, fc_effect_of_movie_full]:
     print(min([x for x in data if str(x) != 'nan']))
@@ -191,32 +198,6 @@ def brain_plotting (df, title, vmin, vmax, cmap, nodes_with_missing_values=None)
     texture = surface.vol_to_surf(new_image_atl, fsaverage.pial_right)
     make_side_by_side_surf_plots(title,texture,vmin=vmin,vmax=vmax,cmap=cmap)
 
-    def brain_plotting_left(df, title, vmin, vmax, cmap, nodes_with_missing_values=None):
-        # check if df has 268 elements
-        if len(df) == 268:
-            pass
-        else:
-            # create a list of 268 nan values
-            nan_list = [np.nan] * 268
-            # replace the nan values with the values of the df
-            j = 0
-            for i in range(268):
-                if i not in nodes_with_missing_values:
-                    nan_list[i] = df[j]
-                    j += 1
-            # replace the df with the new list
-            df = nan_list
-        fsaverage = datasets.fetch_surf_fsaverage()
-        atlas = load_shen_268(1)
-        dr = atlas.get_fdata()
-        dd = dr.copy().astype('float')
-        labels = np.unique(dr)
-        for i in np.array(list(range(268))):
-            dd[dr == labels[i + 1]] = df[i]
-        new_image_atl = nibabel.Nifti1Image(dd, atlas.affine)
-        texture = surface.vol_to_surf(new_image_atl, fsaverage.pial_left)
-        make_side_by_side_surf_plots_left(title, texture, vmin=vmin, vmax=vmax, cmap=cmap)
-
 
 def brain_plotting_left (df, title, vmin, vmax, cmap, nodes_with_missing_values=None):
     # check if df has 268 elements
@@ -245,8 +226,8 @@ def brain_plotting_left (df, title, vmin, vmax, cmap, nodes_with_missing_values=
     make_side_by_side_surf_plots_left(title, texture, vmin=vmin, vmax=vmax, cmap=cmap)
 
 
-if __name__ == '__main__':
-    brain_plotting(hurst, 'brain loadings', 0, 0.15, 'Reds')
+# if __name__ == '__main__':
+    # brain_plotting(hurst, 'brain loadings', 0, 0.15, 'Reds')
     # brain_plotting(hurst_sc, 'brain loadings', 0, 0.15, 'Reds')
     # brain_plotting(hurst_movie_03, 'brain loadings - deep', -0.3, 0.3, 'RdBu_r')
     # brain_plotting(hurst_movie_03_30, 'brain loadings_03_30', -0.3, 0.3, 'RdBu_r')
@@ -275,20 +256,22 @@ if __name__ == '__main__':
 
     # brain_plotting(hurst_effect_of_movie_full, 'Effect of Narrative Listening - Hurst', 0, 0.2, 'Reds')
     # brain_plotting(hurst_rest_full, 'Effect of Propofol - Hurst', 0, 0.2, 'Blues')
-
+    #
     # brain_plotting(fc_effect_of_movie_full, 'Effect of Narrative Listening - FC', 0, 0.2, 'Reds')
     # brain_plotting(fc_rest_full, 'Effect of Propofol - FC', 0, 0.2, 'Blues')
-
+    #
     # brain_plotting(overlap_mask, 'Difference in Hurst Exponents', 0, 1, 'Greens')
     # brain_plotting(movie_new, 'Difference in Hurst Exponents', 0, .15, 'Reds')
     # brain_plotting(rest_new, 'Difference in Hurst Exponents', 0, .2, 'Blues')
-
+    #
     # brain_plotting(fc_overlap_mask, 'Difference in FC', 0, 1, 'Greens')
     # brain_plotting(fc_movie_new, 'Difference in FC', 0, .2, 'Reds')
     # brain_plotting(fc_rest_new, 'Difference in FC', 0, .2, 'Blues')
+    # brain_plotting(general_fc_everything, 'Everything - general FC', 0, 0.11, 'Blues')
+    # brain_plotting(general_fc_movie, 'Movie - general FC', 0, 0.14, 'Reds')
 
     # LEFT HEMISPHERE PLOTTING
-    brain_plotting_left(hurst, 'brain loadings', 0, 0.15, 'Reds')
+    # brain_plotting_left(hurst, 'brain loadings', 0, 0.15, 'Reds')
     # brain_plotting_left(hurst_sc, 'brain loadings', 0, 0.15, 'Reds')
     # brain_plotting_left(hurst_movie_03, 'brain loadings - deep_left', -0.3, 0.3, 'RdBu_r')
     # brain_plotting_left(hurst_movie_02, 'brain loadings - mild_left', -0.3, 0.3, 'RdBu_r')
@@ -310,20 +293,23 @@ if __name__ == '__main__':
     # brain_plotting_left(hurst_combined, 'Combined Effects - Hurst', 0, 0.15, 'Blues')
     # brain_plotting_left(fc_combined, 'Combined Effects - FC', 0, 0.20, 'Blues')
     # brain_plotting_left(fc_everything, 'Everything - FC', 0, 0.20, 'Blues')
-
+    #
     # brain_plotting_left(hurst_effect_of_movie_full, 'Effect of Narrative Listening - Hurst', 0, 0.2, 'Reds')
     # brain_plotting_left(hurst_rest_full, 'Effect of Propofol - Hurst', 0, 0.2, 'Blues')
-
+    #
     # brain_plotting_left(fc_effect_of_movie_full, 'Effect of Narrative Listening - FC', 0, 0.2, 'Reds')
     # brain_plotting_left(fc_rest_full, 'Effect of Propofol - FC', 0, 0.2, 'Blues')
-
+    #
     # brain_plotting_left(overlap_mask, 'Difference in Hurst Exponents', 0, 1, 'Greens')
     # brain_plotting_left(movie_new, 'Difference in Hurst Exponents', 0, .15, 'Reds')
     # brain_plotting_left(rest_new, 'Difference in Hurst Exponents', 0, .2, 'Blues')
-
+    #
     # brain_plotting_left(fc_overlap_mask, 'Difference in FC', 0, 1, 'Greens')
     # brain_plotting_left(fc_movie_new, 'Difference in FC', 0, .2, 'Reds')
     # brain_plotting_left(fc_rest_new, 'Difference in FC', 0, .2, 'Blues')
+
+    # brain_plotting_left(general_fc_everything, 'Everything - general FC (left)', 0, 0.11, 'Blues')
+    # brain_plotting_left(general_fc_movie, 'Movie - general FC (left)', 0, 0.14, 'Reds')
 
 
 # # plot using nilearn

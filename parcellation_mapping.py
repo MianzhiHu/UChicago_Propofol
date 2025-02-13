@@ -11,7 +11,7 @@ from scipy.spatial.distance import cdist
 from plotting_preparation import (new_df, new_df_fc_movie, new_df_effect_of_movie, new_df_fc_effect_of_movie,
                                   new_df_rest_last_60_TR, new_df_fc_rest_last_60_TR,
                                   new_df_combined, new_df_fc_combined, new_df_fc_everything, new_df_movie_everything)
-from brain_plotting import overlap_mask, movie_new, rest_new
+from brain_plotting import overlap_mask, fc_overlap_mask, movie_new, fc_movie_new, rest_new, fc_rest_new
 from docx import Document
 
 # Load the shen parcellation
@@ -61,7 +61,7 @@ for shen_label in shen_labels:
     most_common_aal_label, count = mode(aal_labels_in_shen, keepdims=True)
 
     # Check if there's valid mapping (i.e., the Shen parcel has non-zero AAL labels)
-    if count > 0:
+    if count[0] > 0.1:
         aal_label_name = index_to_name[str(int(most_common_aal_label))]
         shen_to_aal_mapping[shen_label] = aal_label_name
     else:
@@ -139,48 +139,21 @@ def change_format(list):
     df = pd.DataFrame(list, columns=['u1'])
     # add a column of boot_ratio
     df['boot_ratio'] = 0
-
+    # if u1 = 0, make it NaN
+    df.loc[df['u1'] == 0.0, 'u1'] = np.nan
     return df
 
 
 # change the format of the data
-df_hurst_effect_of_movie = change_format(movie_new)
-df_hurst_effect_of_propofol = change_format(rest_new)
+spec_hurst_effect_of_movie = change_format(movie_new)
+spec_hurst_effect_of_propofol = change_format(rest_new)
+spec_fc_effect_of_movie = change_format(fc_movie_new)
+spec_fc_effect_of_propofol = change_format(fc_rest_new)
+overlap_hurst = change_format(overlap_mask)
+overlap_fc = change_format(fc_overlap_mask)
+
 
 # create a table for the z-scores
-aggregated_z_score_table(df_hurst_effect_of_movie, df_hurst_effect_of_propofol, table_name='effect_of_movie_z_score_table1')
-
-
-def aggregated_z_score_table1(df_hurst, df_fc, table_name):
-    hurst_table = single_z_score_table(df_hurst)
-    fc_table = single_z_score_table(df_fc)
-
-    # Resetting index before concatenation
-    hurst_table = hurst_table.reset_index(drop=True)
-    fc_table = fc_table.reset_index(drop=True)
-
-    table_final = pd.concat([hurst_table, fc_table], axis=1)
-
-    # export the mapping as a table
-    # Create a new Word Document
-    doc = Document()
-
-    # Add a table to the Word document
-    # The table will have df.shape[0] rows and df.shape[1] columns
-    table = doc.add_table(rows=table_final.shape[0] + 1, cols=table_final.shape[1])
-
-    # Insert the column names
-    for i, column in enumerate(table_final.columns):
-        table.cell(0, i).text = column
-
-    # Insert the values of dataframe
-    for i in range(table_final.shape[0]):
-        for j in range(table_final.shape[1]):
-            table.cell(i + 1, j).text = str(table_final.values[i, j])
-
-    # Save the doc
-    doc.save(table_name + '.docx')
-
-
-aggregated_z_score_table1(df_hurst_effect_of_movie, df_hurst_effect_of_propofol,
-                             table_name='effect_of_movie_z_score_table')
+aggregated_z_score_table(spec_hurst_effect_of_movie, spec_fc_effect_of_movie, table_name='effect_of_movie_z_score_table')
+aggregated_z_score_table(spec_hurst_effect_of_propofol, spec_fc_effect_of_propofol, table_name='effect_of_propofol_z_score_table')
+aggregated_z_score_table(overlap_hurst, overlap_fc, table_name='overlap_effect_z_score_table')

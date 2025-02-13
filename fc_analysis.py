@@ -546,6 +546,7 @@ fc_surrogates_effect_of_movie = np.load('./data_generated/fc_surrogates_effect_o
 fc_surrogates_combined = np.load('./data_generated/fc_surrogates_combined.npy')
 fc_surrogates_everything = np.load('./data_generated/fc_surrogates_everything.npy')
 hurst_surrogates_everything = np.load('./data_generated/hurst_surrogates_everything.npy')
+hurst_surrogates_effect_of_movie = np.load('./data_generated/hurst_surrogates_effect_of_movie.npy')
 
 # preallocate the lists
 pval_movie_surrogates = []
@@ -574,5 +575,5 @@ def spin_test_for_hurst_versus_fc(hurst, fc, surrogates, n, empty_pval_list):
 # 8 - hurst_combined
 # 9 - hurst_interaction
 
-c, p = spin_test_for_hurst_versus_fc(loadings[:, 6], loadings[:, 0], fc_surrogates_everything, 10000, [])
+c, p = spin_test_for_hurst_versus_fc(loadings[:, 9], loadings[:, 5], hurst_surrogates_everything, 10000, [])
 print(f'corr: {c}, p: {p}')

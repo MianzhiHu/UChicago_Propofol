@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from scipy.stats import hypergeom
 
 nodes_hurst_effect_of_movie = np.load('./data_generated/nodes_with_hurst_values_effect_of_movie.npy')
@@ -11,6 +12,7 @@ nodes_hurst_nl = np.load('./data_generated/nodes_with_hurst_values.npy')
 nodes_fc_nl = np.load('./data_generated/nodes_with_fc_values.npy')
 nodes_hurst_everything = np.load('./data_generated/nodes_with_hurst_values_everything.npy')
 nodes_fc_everything = np.load('./data_generated/nodes_with_fc_values_everything.npy')
+network_label = pd.read_csv('./atlasTransform/atlasTransform/data/shen_268/shen_268_parcellation_networklabels.csv')
 
 
 def overlap_calculator(list1, list2):
@@ -30,7 +32,15 @@ overlap_hurst_propofol = overlap_calculator(nodes_hurst_effect_of_propofol, node
 overlap_fc_propofol = overlap_calculator(nodes_fc_effect_of_propofol, nodes_fc_combined)
 overlap_everything = overlap_calculator(nodes_fc_everything, nodes_hurst_everything)
 print(overlap_calculator(nodes_fc_effect_of_movie, nodes_hurst_everything))
-print(overlap_calculator(nodes_hurst_effect_of_movie, nodes_fc_everything))
+print(overlap_calculator(nodes_hurst_effect_of_movie, nodes_fc_effect_of_movie))
+print(overlap_calculator(nodes_fc_nl, nodes_fc_everything))
+overlapped_fc = [i for i in nodes_fc_effect_of_movie if i in nodes_fc_effect_of_propofol]
+overlapped_hurst = [i for i in nodes_hurst_effect_of_movie if i in nodes_hurst_effect_of_propofol]
+overlapped_labels = network_label.iloc[overlapped_fc]
+print(overlapped_fc)
+print(overlapped_labels['Network'].value_counts())
+
+
 
 
 # calculate the union set of nodes
@@ -50,15 +60,23 @@ overlap_union = overlap_calculator(union, nodes_hurst_combined)
 overlap_union_fc = overlap_calculator(union_fc, nodes_fc_combined)
 overlap_x = overlap_calculator(nodes_fc_combined, union_fc)
 
-list_1 = [nodes_hurst_effect_of_movie, nodes_hurst_effect_of_propofol, union_nodes_hurst, nodes_hurst_nl]
+list_1 = [nodes_hurst_effect_of_movie, nodes_hurst_effect_of_propofol, nodes_hurst_everything,
+          nodes_fc_effect_of_movie, nodes_fc_effect_of_propofol, nodes_fc_everything]
+list_1_names = ['nodes_hurst_effect_of_movie', 'nodes_hurst_effect_of_propofol', 'nodes_hurst_everything',
+                'nodes_fc_effect_of_movie', 'nodes_fc_effect_of_propofol', 'nodes_fc_everything']
 list_2 = [nodes_hurst_combined, nodes_hurst_nl]
 
 list_3 = [nodes_fc_effect_of_movie, nodes_fc_effect_of_propofol, union_nodes_fc, nodes_fc_nl]
 list_4 = [nodes_fc_combined, nodes_fc_nl]
 
-for i in list_1:
-    for j in list_2:
-        overlap_calculator(j, i)
+overlap_matrix = pd.DataFrame()
+for i in range(len(list_1)):
+    for j in range(len(list_1)):
+        print(f'overlap between {list_1_names[i]} and {list_1_names[j]}')
+        overlap = overlap_calculator(list_1[i], list_1[j])
+        overlap_matrix.loc[list_1_names[i], list_1_names[j]] = overlap
+        overlap_matrix = overlap_matrix.round(3)
+
 
 for i in list_3:
     for j in list_4:
@@ -95,12 +113,13 @@ pval_fc_propofol = hypergeometric_test(nodes_fc_effect_of_propofol, nodes_fc_com
 pval_x = hypergeometric_test(nodes_hurst_combined, union)
 pval_everything = hypergeometric_test(nodes_hurst_everything, nodes_fc_everything)
 print(hypergeometric_test(nodes_fc_effect_of_movie, nodes_fc_nl))
-print(hypergeometric_test(nodes_hurst_effect_of_movie, nodes_fc_everything))
+print(hypergeometric_test(nodes_hurst_nl, nodes_fc_nl))
 
-for i in list_1:
-    for j in list_2:
-        hypergeometric_test(j, i)
+hypergeom_matrix = pd.DataFrame()
+for i in range(len(list_1)):
+    for j in range(len(list_1)):
+        print(f'hypergeometric test between {list_1_names[i]} and {list_1_names[j]}')
+        pval = hypergeometric_test(list_1[i], list_1[j])
+        hypergeom_matrix.loc[list_1_names[i], list_1_names[j]] = pval
+        hypergeom_matrix = hypergeom_matrix.round(3)
 
-for i in list_3:
-    for j in list_4:
-        hypergeometric_test(j, i)

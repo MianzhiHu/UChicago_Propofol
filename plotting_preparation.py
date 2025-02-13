@@ -40,6 +40,9 @@ edges_lv_vals_rest_post_hoc = sio.loadmat('./data_generated/PLS_outputTaskPLSedg
 edges_lv_vals_combined = sio.loadmat('./data_generated/PLS_outputTaskPLSedges_combined_lv_vals.mat')
 edges_lv_vals_everything = sio.loadmat('./data_generated/PLS_outputTaskPLSedges_everything_lv_vals.mat')
 
+general_fc_everything = sio.loadmat('./data_generated/PLS_outputTaskPLSgeneral_fc_everything_lv_vals.mat')
+general_fc_movie = sio.loadmat('./data_generated/PLS_outputTaskPLSgeneral_fc_movie_lv_vals.mat')
+
 corr = spearmanr(fc_lv_vals_double_three_way['u1'][:, 0], fc_lv_vals_double_two_way['u1'][:, 0])
 corr_1 = spearmanr(fc_lv_vals_double_two_way['u1'][:, 0], fc_lv_vals_double_merged['u1'][:, 0])
 corr_2 = spearmanr(fc_lv_vals_double_two_way['u1'][:, 0], lv_vals_double_two_way['u1'][:, 0])
@@ -79,6 +82,9 @@ edges_boot_ratio_rest_post_hoc = sio.loadmat('./data_generated/PLS_outputTaskPLS
 edges_boot_ratio_combined = sio.loadmat('./data_generated/PLS_outputTaskPLSedges_combined.mat')
 edges_boot_ratio_everything = sio.loadmat('./data_generated/PLS_outputTaskPLSedges_everything.mat')
 
+general_fc_boot_ratio_everything = sio.loadmat('./data_generated/PLS_outputTaskPLSgeneral_fc_everything.mat')
+general_fc_boot_ratio_movie = sio.loadmat('./data_generated/PLS_outputTaskPLSgeneral_fc_movie.mat')
+
 # load the missing nodes
 double_nan = np.load('./data_generated/double_missing.npy')
 fc_movie_nan = np.load('./data_generated/fc_movie_nan.npy')
@@ -98,6 +104,8 @@ edges_double_nan = np.load('./data_generated/missing_edges_double.npy')
 edges_rest_post_hoc_nan = np.load('./data_generated/missing_edges_rest_post_hoc.npy')
 edges_combined_nan = np.load('./data_generated/missing_edges_combined.npy')
 edges_everything_nan = np.load('./data_generated/missing_edges_everything.npy')
+
+general_fc_nan = np.load('./data_generated/general_fc_missing_nodes.npy')
 
 
 # # find the union set between df_movie_missing and df_last_60_TR_missing
@@ -196,6 +204,9 @@ fc_effect_of_movie_full = plot_preparation(fc_lv_vals_effect_of_movie, fc_boot_r
                                              fc_effect_of_movie_nan, keep=True)
 fc_rest_full = plot_preparation(fc_lv_vals_rest_last_60_TR, fc_boot_ratio_rest_last_60_TR, fc_rest_last_60_TR_nan,
                                     keep=True)
+
+general_fc_everything = plot_preparation(general_fc_everything, general_fc_boot_ratio_everything, general_fc_nan)
+general_fc_movie = plot_preparation(general_fc_movie, general_fc_boot_ratio_movie, general_fc_nan)
 
 
 def plot_preparation_for_2ndLV(lv_vals, boot_ratio, nodes_with_missing_values):
