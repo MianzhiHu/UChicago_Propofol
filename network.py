@@ -106,15 +106,15 @@ def find_network(file_path: str, hurst=None, condition: str = None):
 
     fig, ax = plt.subplots(1, 2, figsize=(30, 12))
     ax[0].bar(value_count.index, value_count.values)
+    ax[0].set_ylim(bottom=0, top=25)
     # ax[0].set_title('Number of Nodes in Each Network for ' + condition)
     # ax[0].set_xlabel('Network')
     ax[0].set_ylabel('Number of Nodes', fontsize=32)
     ax[0].yaxis.set_major_locator(MaxNLocator(integer=True))
-    # adjust y-axis ticks font size
     ax[0].tick_params(axis='y', labelsize=32)
     ax[0].set_xticks(range(len(value_count.index)))
     ax[0].set_xticklabels([])
-    # ax[0].set_xticklabels(rotation=45, ha='right', labels=value_count.index)
+    # ax[0].set_xticklabels(rotation=45, ha='right', labels=value_count.index, fontsize=30)
     fig.subplots_adjust(bottom=0.3)
     ax[1].bar(network_bl.index, network_bl.values)
     # manually code the order of the x-axis labels
@@ -122,12 +122,12 @@ def find_network(file_path: str, hurst=None, condition: str = None):
     # ax[1].set_title('Mean Absolute Brain Loadings for Each Network for ' + condition)
     # ax[1].set_xlabel('Network')
     ax[1].set_ylabel('Mean Absolute Brain Loadings', fontsize=32)
-    ax[1].set_ylim(bottom=0.05)
+    ax[1].set_ylim(bottom=0.05, top=0.19)
     ax[1].tick_params(axis='y', labelsize=32)
     # # set the number of ticks on the y-axis to start at 0.07 and end at 0.12
-    # ax[1].yaxis.set_ticks(np.arange(0.05, 0.119, 0.01))# Set the x-ticks without labels
+    # ax[1].yaxis.set_ticks(np.arange(0.05, 0.119, 0.01))
     ax[1].set_xticklabels([])
-    # ax[1].set_xticklabels(rotation=45, ha='right', labels=network_bl.index)
+    # ax[1].set_xticklabels(rotation=45, ha='right', labels=network_bl.index, fontsize=30)
     fig.subplots_adjust(bottom=0.3)
     plt.savefig('./graphs/brain_loading_' + condition + '.png')
     plt.show()
@@ -156,10 +156,10 @@ posthoc_fc_movie = find_network('./data_generated/nodes_with_fc_values.npy', fc_
 # posthoc_fc_rest = find_network('./data_generated/nodes_with_fc_values_rest.npy', fc_rest, 'Resting State')
 # posthoc_fc_movie_abs = find_network('./data_generated/nodes_with_fc_values_abs.npy', fc_movie_abs, 'Narrative Listening')
 # posthoc_fc_double_two_way = find_network('./data_generated/nodes_with_fc_values_double_two_way.npy', fc_double_two_way, 'Propofol + Narrative Listening')
-# posthoc_fc_rest_last_60_TR = find_network('./data_generated/nodes_with_fc_values_rest_last_60_TR.npy', fc_rest_last_60_TR, 'Propofol - FC')
+posthoc_fc_rest_last_60_TR = find_network('./data_generated/nodes_with_fc_values_rest_last_60_TR.npy', fc_rest_last_60_TR, 'Propofol - FC')
 # # posthoc_hurst_double_two_way = find_network('./data_generated/nodes_with_hurst_double_two_way.npy', hurst_double_two_way, 'Propofol + Narrative Listening')
 posthoc_fc_effect_of_movie = find_network('./data_generated/nodes_with_fc_values_effect_of_movie.npy', fc_effect_of_movie, 'Narrative Listening - FC')
-# posthoc_fc_everything = find_network('./data_generated/nodes_with_fc_values_everything.npy', fc_everything, 'Everything - FC')
+posthoc_fc_everything = find_network('./data_generated/nodes_with_fc_values_everything.npy', fc_everything, 'Everything - FC')
 
 
 # do the same for some individual datasets

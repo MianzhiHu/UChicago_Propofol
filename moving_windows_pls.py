@@ -110,11 +110,11 @@ last_window_mild_clean = last_window_all.iloc[9:16, :]
 last_window_deep_clean = last_window_all.iloc[16:22, :]
 last_window_recovery_clean = last_window_all.iloc[22:31, :]
 
-# # save the last windows to CSV files
-# last_window_awake_clean.to_csv('./data_generated/last_window_awake.csv', index=False, header=False)
-# last_window_mild_clean.to_csv('./data_generated/last_window_mild.csv', index=False, header=False)
-# last_window_deep_clean.to_csv('./data_generated/last_window_deep.csv', index=False, header=False)
-# last_window_recovery_clean.to_csv('./data_generated/last_window_recovery.csv', index=False, header=False)
+# save the last windows to CSV files
+last_window_awake_clean.to_csv('./data_generated/last_window_awake.csv', index=False, header=False)
+last_window_mild_clean.to_csv('./data_generated/last_window_mild.csv', index=False, header=False)
+last_window_deep_clean.to_csv('./data_generated/last_window_deep.csv', index=False, header=False)
+last_window_recovery_clean.to_csv('./data_generated/last_window_recovery.csv', index=False, header=False)
 
 # # plot the boxplot of significant nodes
 # nodes_last_window = np.load('./data_generated/nodes_with_hurst_values_last_60_TR.npy').tolist()

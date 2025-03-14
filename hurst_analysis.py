@@ -4,6 +4,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import scipy.stats as stats
+from numpy.f2py.crackfortran import skipfuncs
+
 from dfa import dfa
 
 target_dir = 'data_clean'
@@ -14,6 +16,9 @@ def read_files(directory: str):
         if file.endswith(".netts"):
             # load data as numpy 2d array
             array_2d = np.loadtxt(os.path.join(target_dir, file), delimiter='\t')
+
+            # Only keep 90-150 rows
+            array_2d = array_2d[:, 90:150]
             yield array_2d, file
 
 # for array_2d, file in read_files(directory=target_dir):
@@ -52,190 +57,19 @@ def preprocess():
         print(f'processing done for {file}')
 
     print('finished processing all files, saving to pickle')
-    with open('outcome.pickle', 'wb') as outfile:
+    with open('outcome_60TR.pickle', 'wb') as outfile:
         pickle.dump(results_dict, outfile)
 
 
-#preprocess()
+preprocess()
 
-#     print('show results from pickle')
-#
-#     # Average across movie and rest condition
-#     print(f'# Averaging across movie and rest condition')
-#     movie_average: list = []
-#     rest_average: list = []
-#
-#     with open('outcome_268.pickle', 'rb') as f:
-#         results_dict = pickle.load(f)
-#         counter = 0
-#         for key, value in results_dict.items():
-#             if 'movie' in key:
-#                 counter += 1
-#                 movie_average.append(value['hurst'].mean())
-#                 movie_total_average = mean(movie_average)
-#             elif 'rest' in key:
-#                 counter += 1
-#                 rest_average.append(value['hurst'].mean())
-#                 rest_total_average = mean(rest_average)
-#         print(f'movie_average is {movie_average}')
-#         print(f'rest_average is {rest_average}')
-#         print(f'movie_total_average is {movie_total_average}')
-#         print(f'rest_total_average is {rest_total_average}')
-#         print(stats.ttest_ind(movie_average, rest_average))
-#
-#         df1 = [movie_average, rest_average]
-#         plt.boxplot(df1)
-#         plt.xticks([1, 2], ['movie_average', 'rest_average'])
-#         plt.show()
-#
-#     # Average across sedation levels
-#     print(f'# Averaging across sedation levels')
-#     awake_average: list = []
-#     mild_average: list = []
-#     deep_average: list = []
-#     recovery_average: list = []
-#
-#     with open('outcome_268.pickle', 'rb') as f:
-#         results_dict = pickle.load(f)
-#         counter = 0
-#         for key, value in results_dict.items():
-#             if '_01_LPI' in key:
-#                 counter += 1
-#                 awake_average.append(value['hurst'].mean())
-#                 awake_total_average = mean(awake_average)
-#             elif '_02_LPI' in key:
-#                 counter += 1
-#                 mild_average.append(value['hurst'].mean())
-#                 mild_total_average = mean(mild_average)
-#             elif '_03_LPI' in key:
-#                 counter += 1
-#                 deep_average.append(value['hurst'].mean())
-#                 deep_total_average = mean(deep_average)
-#             elif '_04_LPI' in key:
-#                 counter += 1
-#                 recovery_average.append(value['hurst'].mean())
-#                 recovery_total_average = mean(recovery_average)
-#         print(f'awake_average is {awake_average}')
-#         print(f'mild_average is {mild_average}')
-#         print(f'deep_average is {deep_average}')
-#         print(f'recovery_average is {recovery_average}')
-#         print(f'awake_total_average is {awake_total_average}')
-#         print(f'mild_total_average is {mild_total_average}')
-#         print(f'deep_total_average is {deep_total_average}')
-#         print(f'recovery_total_average is {recovery_total_average}')
-#         print(stats.f_oneway(awake_average, mild_average, deep_average, recovery_average))
-#         print(stats.ttest_ind(deep_average, awake_average))
-#         print(stats.kruskal(awake_average, mild_average, deep_average, recovery_average))
-#
-#         df2 = [awake_average, mild_average, deep_average, recovery_average]
-#         plt.boxplot(df2)
-#         plt.xticks([1, 2, 3, 4], ['awake', 'mild', 'deep', 'recovery'])
-#         plt.show()
-#
-#     # Average across sedation levels for movie condition
-#     print(f'# Averaging across sedation levels for movie condition')
-#     movie_awake_average: list = []
-#     movie_mild_average: list = []
-#     movie_deep_average: list = []
-#     movie_recovery_average: list = []
-#
-#     with open('outcome_268.pickle', 'rb') as f:
-#         results_dict = pickle.load(f)
-#         counter = 0
-#         for key, value in results_dict.items():
-#             if 'movie_01_LPI' in key:
-#                 counter += 1
-#                 movie_awake_average.append(value['hurst'].mean())
-#                 movie_awake_total_average = mean(movie_awake_average)
-#             elif 'movie_02_LPI' in key:
-#                 counter += 1
-#                 movie_mild_average.append(value['hurst'].mean())
-#                 movie_mild_total_average = mean(movie_mild_average)
-#             elif 'movie_03_LPI' in key:
-#                 counter += 1
-#                 movie_deep_average.append(value['hurst'].mean())
-#                 movie_deep_total_average = mean(movie_deep_average)
-#             elif 'movie_04_LPI' in key:
-#                 counter += 1
-#                 movie_recovery_average.append(value['hurst'].mean())
-#                 movie_recovery_total_average = mean(movie_recovery_average)
-#         print(f'movie_awake_average is {movie_awake_average}')
-#         print(f'movie_mild_average is {movie_mild_average}')
-#         print(f'movie_deep_average is {movie_deep_average}')
-#         print(f'movie_recovery_average is {movie_recovery_average}')
-#         print(f'movie_awake_total_average is {movie_awake_total_average}')
-#         print(f'movie_mild_total_average is {movie_mild_total_average}')
-#         print(f'movie_deep_total_average is {movie_deep_total_average}')
-#         print(f'movie_recovery_total_average is {movie_recovery_total_average}')
-#         print(stats.f_oneway(movie_awake_average, movie_mild_average, movie_deep_average, movie_recovery_average))
-#         print(stats.ttest_ind(movie_deep_average, movie_awake_average))
-#         print(stats.kruskal(movie_awake_average, movie_mild_average, movie_deep_average, movie_recovery_average))
-#
-#         df3 = [movie_awake_average, movie_mild_average, movie_deep_average, movie_recovery_average]
-#         plt.boxplot(df3)
-#         plt.xticks([1, 2, 3, 4], ['movie_awake', 'movie_mild', 'movie_deep', 'movie_recovery'])
-#         plt.show()
-#
-#     # Average across sedation levels for rest condition
-#     print(f'# Averaging across sedation levels for rest condition')
-#     rest_awake_average: list = []
-#     rest_mild_average: list = []
-#     rest_deep_average: list = []
-#     rest_recovery_average: list = []
-#
-#     with open('outcome_268.pickle', 'rb') as f:
-#         results_dict = pickle.load(f)
-#         counter = 0
-#         for key, value in results_dict.items():
-#             if 'rest_01_LPI' in key:
-#                 counter += 1
-#                 rest_awake_average.append(value['hurst'].mean())
-#                 rest_awake_total_average = mean(rest_awake_average)
-#             elif 'rest_02_LPI' in key:
-#                 counter += 1
-#                 rest_mild_average.append(value['hurst'].mean())
-#                 rest_mild_total_average = mean(rest_mild_average)
-#             elif 'rest_03_LPI' in key:
-#                 counter += 1
-#                 rest_deep_average.append(value['hurst'].mean())
-#                 rest_deep_total_average = mean(rest_deep_average)
-#             elif 'rest_04_LPI' in key:
-#                 counter += 1
-#                 rest_recovery_average.append(value['hurst'].mean())
-#                 rest_recovery_total_average = mean(rest_recovery_average)
-#         print(f'rest_awake_average is {rest_awake_average}')
-#         print(f'rest_mild_average is {rest_mild_average}')
-#         print(f'rest_deep_average is {rest_deep_average}')
-#         print(f'rest_recovery_average is {rest_recovery_average}')
-#         print(f'rest_awake_total_average is {rest_awake_total_average}')
-#         print(f'rest_mild_total_average is {rest_mild_total_average}')
-#         print(f'rest_deep_total_average is {rest_deep_total_average}')
-#         print(f'rest_recovery_total_average is {rest_recovery_total_average}')
-#         print(stats.f_oneway(rest_awake_average, rest_mild_average, rest_deep_average, rest_recovery_average))
-#         print(stats.ttest_ind(rest_deep_average, rest_awake_average))
-#         print(stats.kruskal(rest_awake_average, rest_mild_average, rest_deep_average, rest_recovery_average))
-#
-#         df4 = [rest_awake_average, rest_mild_average, rest_deep_average, rest_recovery_average]
-#         plt.boxplot(df4)
-#         plt.xticks([1, 2, 3, 4], ['rest_awake', 'rest_mild', 'rest_deep', 'rest_recovery'])
-#         plt.show()
+# ======================================================================================================================
+# pickle_to_read = './pickles/outcome_268.pickle'
+# pickle_to_read = './pickles/outcome_60TR.pickle'
+pickle_to_read = './pickles/fc_dict.pickle'
+# pickle_to_read = './pickles/fc_dict_last_60_TR.pickle'
 
-    # with open('outcome_268.pickle', 'rb') as f:
-    #     results_dict = pickle.load(f)
-    #     counter = 0
-    #     for key, value in results_dict.items():
-    #         keys = list(results_dict.keys())
-    #         values = [value['hurst'].mean() for value in results_dict.values()]
-    #         r_squared = [value['r_squared'].mean() for value in results_dict.values()]
-    #         # create a DataFrame from the keys and values
-    #         df = pd.DataFrame({'key': keys, 'hurst_average': values, 'r_squared': r_squared})
-    #
-    #     # print the DataFrame
-    #     print(df)
-    #     df.to_csv('hurst_averages.csv', index=False)
-
-
-with open('./pickles/outcome_268.pickle', 'rb') as f:
+with open(pickle_to_read, 'rb') as f:
     results_dict = pickle.load(f)
     for key, value in results_dict.items():
         # check how many files contain the string 'rest_01_LPI'
@@ -247,6 +81,17 @@ with open('./pickles/outcome_268.pickle', 'rb') as f:
         key_6 = [key for key in results_dict.keys() if 'movie_02_LPI' in key]
         key_7 = [key for key in results_dict.keys() if 'movie_03_LPI' in key]
         key_8 = [key for key in results_dict.keys() if 'movie_04_LPI' in key]
+
+        # save all results as separate csv
+        if '.npy' in key:
+            key_new = key.replace('.npy', '')
+
+        value_df = pd.DataFrame(value)
+        # value_df.to_csv(f'./data_generated/Hurst_mixed/{key_new}.csv', index=False)
+        if 'movie' in key:
+            value_df.to_csv(f'./data_generated/FC_mixed/{key_new}.csv', index=False)
+
+
     # print the number of files
     print(f'Number of files containing rest_01_LPI is {len(key_1)}')
     print(f'Number of files containing rest_02_LPI is {len(key_2)}')
@@ -258,7 +103,182 @@ with open('./pickles/outcome_268.pickle', 'rb') as f:
     print(f'Number of files containing movie_04_LPI is {len(key_8)}')
 
 
+# ======================================================================================================================
+# Update: Rewrite the function to read and filter data files
+# ======================================================================================================================
+class AggregatedDataGenerator:
+    def __init__(self, file_path: str, data_type: str):
+        """
+        Initialize the AggregatedDataGenerator with the path to the directory
+        containing the CSV files.
+        """
+        self.file_path = file_path
+        self.data_type_dict = {
+            'hurst': self.process_hurst,
+            'fc': self.process_fc,
+            'edges': self.process_edges
+        }
+        self.process_module = self.data_type_dict[data_type]
 
+    def save_results(self, condition_data: dict, missing_columns: list, output_path: str):
+        """
+        Save the results to csv files.
+
+        Parameters:
+            results_dict (dict): Dictionary with condition keys and their respective DataFrames.
+            missing_columns (list): List of column names across all data that have missing values.
+            missing_columns_per_condition (dict): Dictionary with condition keys and a list of
+                                                  missing column names for each.
+        """
+        # Create the output directory if it doesn't exist
+        os.makedirs(output_path, exist_ok=True)
+
+        # Save each condition's DataFrame to a separate CSV file
+        for condition, df in condition_data.items():
+            output_file = os.path.join(output_path, f"{condition}_concatenated.csv")
+            df.to_csv(output_file, index=True)
+            print(f"Saved {output_file}")
+
+        # Save the missing columns to a CSV file
+        missing_df = pd.DataFrame(missing_columns, columns=["missing_column"])
+        missing_file = os.path.join(output_path, "missing_columns.csv")
+        missing_df.to_csv(missing_file, index=False)
+        print(f"Saved {missing_file}")
+
+    def process_hurst(self, full_path: str, key: str, filename: str):
+        df = pd.read_csv(full_path, usecols=[0]).T
+        df.index = [f"{key}_{os.path.splitext(filename)[0]}"]
+        return df
+
+    def process_fc(self, full_path: str, key: str, filename: str):
+        df = pd.read_csv(full_path)
+        df = df.replace(2.0, pd.NA)
+        # # Take the absolute value before averaging FC (positive and negative FC would be retained as absolute FC strength)
+        # df = df.abs()
+        col_means = df.mean(skipna=True)
+        means_df = col_means.to_frame().T
+        means_df.index = [f"{key}_{os.path.splitext(filename)[0]}"]
+        # Take the absolute value after averaging FC (positive and negative FC would be averaged out)
+        means_df = means_df.abs()
+        return means_df
+
+    def process_edges(self, full_path: str, key: str, filename: str):
+        df = pd.read_csv(full_path)
+        arr = df.to_numpy()
+        n = arr.shape[0]
+        # Extract upper triangle indices (excluding the main diagonal)
+        triu_indices = np.triu_indices(n, k=1)
+        edges = arr[triu_indices]
+        edges_df = pd.DataFrame([edges])
+        edges_df = edges_df.abs()
+        edges_df.index = [f"{key}_{os.path.splitext(filename)[0]}"]
+        return edges_df
+
+    def process(self, keys: list, output_path: str):
+        condition_data = {}
+
+        # Process each condition.
+        for key in keys:
+            dfs = []
+            for file in os.listdir(self.file_path):
+                if key in file and file.endswith('.csv'):
+                    full_path = os.path.join(self.file_path, file)
+                    df = self.process_module(full_path, key, file)
+                    dfs.append(df)
+            condition_data[key] = pd.concat(dfs, axis=0) if dfs else pd.DataFrame()
+
+        # Aggregate data across conditions.
+        all_dfs = [df for df in condition_data.values() if not df.empty]
+        all_data = pd.concat(all_dfs, axis=0) if all_dfs else pd.DataFrame()
+        missing_columns = all_data.columns[all_data.isna().any()].tolist() if not all_data.empty else []
+
+        # Remove columns with missing values from each condition.
+        if missing_columns:
+            columns_to_keep = all_data.columns[~all_data.isna().any()]
+            for key, df in condition_data.items():
+                condition_data[key] = df[columns_to_keep] if not df.empty else pd.DataFrame()
+
+        # Save the results to CSV files
+        self.save_results(condition_data, missing_columns, output_path)
+
+        return condition_data, missing_columns
+
+
+# Example Usage
+# Define the input file paths
+hurst_file_path = './data_generated/Hurst_mixed/'
+fc_file_path = './data_generated/FC_mixed/'
+
+# Define the output file path
+output_path = './data_generated/Hurst_csv_output'
+
+# Select from the following:
+# movie_01: Narrative-Listening Awake
+# movie_02: Narrative-Listening Mild Sedation
+# movie_03: Narrative-Listening Deep Sedation
+# movie_04: Narrative-Listening Recovery
+# rest_01: Resting-State Awake
+# rest_02: Resting-State Mild Sedation
+# rest_03: Resting-State Deep Sedation
+# rest_04: Resting-State Recovery
+# key = ['movie_01', 'movie_02', 'movie_03', 'movie_04', 'rest_01', 'rest_02', 'rest_03', 'rest_04'] # This is for 8-Condition Contrast
+key = ['movie_01', 'rest_01']  # This is for 2-Condition Contrast
+
+# Create an instance of the AggregatedDataGenerator
+# Data type can be 'hurst', 'fc', or 'edges'
+agg_gen = AggregatedDataGenerator(fc_file_path, 'hurst')
+
+# Process the data
+condition_data, missing_all = agg_gen.process(key, output_path)
+
+print("Data for each condition:")
+for key, df in condition_data.items():
+    print(f"\nCondition: {key}")
+    print(df.head())
+
+print("\nMissing columns across all data:", missing_all)
+
+
+# ======================================================================================================================
+# Try to revert last window
+# ======================================================================================================================
+last_window_all = pd.read_csv('./data_generated/last_60_TR_all.csv', index_col=0)
+last_window_awake = pd.read_csv('./data_generated/last_window_awake.csv', header=None)
+last_window_mild = pd.read_csv('./data_generated/last_window_mild.csv', header=None)
+last_window_deep = pd.read_csv('./data_generated/last_window_deep.csv', header=None)
+last_window_recovery = pd.read_csv('./data_generated/last_window_recovery.csv', header=None)
+
+
+# if rest is in the index, save it as a separate csv
+rest_files = [file for file in last_window_all.index if 'rest' in file]
+for file in rest_files:
+    df = last_window_all.loc[file]
+    df.columns = ['Hurst']
+    df.to_csv(f'./data_generated/Hurst_last_window/{file}.csv', index=False)
+
+# print the number of files in a directory
+dir = './data_generated/Hurst_mixed/'
+
+print(f'Number of files in {dir} is {len([file for file in os.listdir(dir) if file.endswith(".csv")])}')
+
+
+def read_files(directory: str):
+    counter = 0
+    for file in os.listdir(directory):
+        if file.endswith(".netts") and 'rest' in file:
+            # load data as numpy 2d array
+            array_2d = np.loadtxt(os.path.join(target_dir, file), delimiter='\t')
+
+            # Only keep 90-150 rows
+            array_2d = array_2d[:, 90:150]
+            if array_2d.shape[1] == 60:
+                counter += 1
+
+            print(array_2d.shape)
+            print(counter)
+
+
+read_files(directory=target_dir)
 
 
 
