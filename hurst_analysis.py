@@ -5,24 +5,21 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import scipy.stats as stats
 from numpy.f2py.crackfortran import skipfuncs
-
 from dfa import dfa
+from pathlib import Path
 
 target_dir = 'data_clean'
 
 
 def read_files(directory: str):
     for file in os.listdir(directory):
-        if file.endswith(".netts"):
+        if file.endswith(".npy"):
             # load data as numpy 2d array
-            array_2d = np.loadtxt(os.path.join(target_dir, file), delimiter='\t')
+            array_2d = np.load(os.path.join(target_dir, file))
 
-            # Only keep 90-150 rows
-            array_2d = array_2d[:, 90:150]
+            # # Only keep 90-150 rows
+            # array_2d = array_2d[:, 90:150]
             yield array_2d, file
-
-# for array_2d, file in read_files(directory=target_dir):
-#     print(array_2d.shape)
 
 
 def preprocess():
@@ -33,16 +30,22 @@ def preprocess():
     mx = int(np.floor(1 / (tr * min_frequency)))
     counter = 0
     results_dict = {}
-    for array_2d, file in read_files(directory=target_dir):
+    for array_2d_raw, file in read_files(directory=target_dir):
+        if array_2d_raw.shape[1] < 60:
+            print(f'skipping {file} because it has too few TRs')
+            continue
+        mask = ~(np.all((array_2d_raw == 0) | np.isnan(array_2d_raw), axis=0))
+        array_2d = array_2d_raw[:, mask]
+        print(f'array_2d raw shape: {array_2d_raw.shape}; array_2d shape: {array_2d.shape}')
+        if array_2d.shape[1] < 50:
+            print(f'skipping {file} because it has too few TRs after censoring')
+            continue
+
         dfa_results = dfa(x=array_2d.T, max_window_size=mx, min_window_size=mn, return_confidence_interval=True,
                           return_windows=False)
         split_h = len(dfa_results[0])
         # turn results into a 2d array, where each column is a key
         hurst = np.hsplit(np.array(np.array(dfa_results[0])), split_h)
-        print(dfa_results[0])
-        print(dfa_results[1])
-        print(f'length of dfa_results[0]: {len(dfa_results[0])}')
-        print(f'length of dfa_results[1]: {len(dfa_results[1])}')
         cis0 = np.array([item[0] for item in dfa_results[1]])
         cis1 = np.array([item[1] for item in dfa_results[1]])
         cis0 = np.hsplit(cis0, split_h)
@@ -57,51 +60,53 @@ def preprocess():
         print(f'processing done for {file}')
 
     print('finished processing all files, saving to pickle')
-    with open('outcome_60TR.pickle', 'wb') as outfile:
+    with open('./data_generated/pickles/outcome_dict.pickle', 'wb') as outfile:
         pickle.dump(results_dict, outfile)
 
 
-preprocess()
+# preprocess()
 
 # ======================================================================================================================
-# pickle_to_read = './pickles/outcome_268.pickle'
-# pickle_to_read = './pickles/outcome_60TR.pickle'
-pickle_to_read = './pickles/fc_dict.pickle'
-# pickle_to_read = './pickles/fc_dict_last_60_TR.pickle'
-
-with open(pickle_to_read, 'rb') as f:
-    results_dict = pickle.load(f)
-    for key, value in results_dict.items():
-        # check how many files contain the string 'rest_01_LPI'
-        key_1 = [key for key in results_dict.keys() if 'rest_01_LPI' in key]
-        key_2 = [key for key in results_dict.keys() if 'rest_02_LPI' in key]
-        key_3 = [key for key in results_dict.keys() if 'rest_03_LPI' in key]
-        key_4 = [key for key in results_dict.keys() if 'rest_04_LPI' in key]
-        key_5 = [key for key in results_dict.keys() if 'movie_01_LPI' in key]
-        key_6 = [key for key in results_dict.keys() if 'movie_02_LPI' in key]
-        key_7 = [key for key in results_dict.keys() if 'movie_03_LPI' in key]
-        key_8 = [key for key in results_dict.keys() if 'movie_04_LPI' in key]
-
-        # save all results as separate csv
-        if '.npy' in key:
-            key_new = key.replace('.npy', '')
-
-        value_df = pd.DataFrame(value)
-        # value_df.to_csv(f'./data_generated/Hurst_mixed/{key_new}.csv', index=False)
-        if 'movie' in key:
-            value_df.to_csv(f'./data_generated/FC_mixed/{key_new}.csv', index=False)
-
-
-    # print the number of files
-    print(f'Number of files containing rest_01_LPI is {len(key_1)}')
-    print(f'Number of files containing rest_02_LPI is {len(key_2)}')
-    print(f'Number of files containing rest_03_LPI is {len(key_3)}')
-    print(f'Number of files containing rest_04_LPI is {len(key_4)}')
-    print(f'Number of files containing movie_01_LPI is {len(key_5)}')
-    print(f'Number of files containing movie_02_LPI is {len(key_6)}')
-    print(f'Number of files containing movie_03_LPI is {len(key_7)}')
-    print(f'Number of files containing movie_04_LPI is {len(key_8)}')
-
+# # pickle_to_read = './data_generated/pickles/outcome_dict.pickle'
+# # pickle_to_read = './data_generated/pickles/outcome_60TR.pickle'
+# # pickle_to_read = './data_generated/pickles/fc_dict.pickle'
+# pickle_to_read = './data_generated/pickles/fc_dict_last_60_TR.pickle'
+# last_window = True
+# i = 0
+# low_r2 = []
+#
+# with open(pickle_to_read, 'rb') as f:
+#     results_dict = pickle.load(f)
+#     for key, value in results_dict.items():
+#
+#         # save all results as separate csv
+#         key_new = key.replace('.npy', '')
+#
+#         value_df = pd.DataFrame(value)
+#
+#         # check whether the pickle file to read is hurst or fc
+#         if 'outcome' in pickle_to_read:
+#             # filter out data with low R²
+#             mean_r2 = value_df['r_squared'].mean()
+#             if mean_r2 < 0.90:
+#                 i += 1
+#                 low_r2.append(key)
+#                 print(f"Skipping {key_new}: mean R² = {mean_r2:.3f} < 0.9")
+#                 continue
+#             folder_path = 'Hurst_mixed'
+#         elif 'fc' in pickle_to_read:
+#             folder_path = 'FC_mixed'
+#
+#         # value_df.to_csv(f'./data_generated/{folder_path}/{key_new}.csv', index=False)
+#
+#         if last_window:
+#             if 'rest' in key:
+#                 value_df.to_csv(f'./data_generated/{folder_path}/{key_new}.csv', index=False)
+#         else:
+#             if 'movie' in key:
+#                 value_df.to_csv(f'./data_generated/{folder_path}/{key_new}.csv', index=False)
+#
+# print(f'{i} files skipped due to low R²')
 
 # ======================================================================================================================
 # Update: Rewrite the function to read and filter data files
@@ -114,9 +119,9 @@ class AggregatedDataGenerator:
         """
         self.file_path = file_path
         self.data_type_dict = {
-            'hurst': self.process_hurst,
-            'fc': self.process_fc,
-            'edges': self.process_edges
+            'Hurst': self.process_hurst,
+            'FC': self.process_fc,
+            'Edges': self.process_edges
         }
         self.process_module = self.data_type_dict[data_type]
 
@@ -210,7 +215,7 @@ hurst_file_path = './data_generated/Hurst_mixed/'
 fc_file_path = './data_generated/FC_mixed/'
 
 # Define the output file path
-output_path = './data_generated/Hurst_csv_output'
+output_path = Path('./data_generated/Contrasts/')
 
 # Select from the following:
 # movie_01: Narrative-Listening Awake
@@ -221,64 +226,73 @@ output_path = './data_generated/Hurst_csv_output'
 # rest_02: Resting-State Mild Sedation
 # rest_03: Resting-State Deep Sedation
 # rest_04: Resting-State Recovery
-# key = ['movie_01', 'movie_02', 'movie_03', 'movie_04', 'rest_01', 'rest_02', 'rest_03', 'rest_04'] # This is for 8-Condition Contrast
-key = ['movie_01', 'rest_01']  # This is for 2-Condition Contrast
 
-# Create an instance of the AggregatedDataGenerator
-# Data type can be 'hurst', 'fc', or 'edges'
-agg_gen = AggregatedDataGenerator(fc_file_path, 'hurst')
+# your three data types and the corresponding file paths
+data_types = {
+    'Hurst': hurst_file_path,
+    'FC':    fc_file_path,
+    'Edges': fc_file_path
+}
 
-# Process the data
-condition_data, missing_all = agg_gen.process(key, output_path)
+# your four “key‐lists” (you can name these anything you like)
+key_sets = {
+    '8_condition': ['movie_01','movie_02','movie_03','movie_04', 'rest_01','rest_02','rest_03','rest_04'], # This is for 8-Condition Contrast
+    'Effects of Narrative-Listening': ['movie_01','rest_01'], # This is the effect of narrative-listening
+    'Effects of Propofol': ['rest_01','rest_02','rest_03','rest_04'], # This is the effect of propofol
+    'Effects of Propofol on Narrative-Listening': ['movie_01','movie_02','movie_03','movie_04'], # This is the effect of propofol on narrative-listening
+}
 
-print("Data for each condition:")
-for key, df in condition_data.items():
-    print(f"\nCondition: {key}")
-    print(df.head())
+all_results = {}
 
-print("\nMissing columns across all data:", missing_all)
+for dtype, file_path in data_types.items():
+    agg = AggregatedDataGenerator(file_path, dtype)
 
+    for set_name, keys in key_sets.items():
+        # make a subfolder per dtype+set_name
+        out_dir = output_path / set_name / dtype
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        # process & save
+        condition_data, missing_all = agg.process(keys, str(out_dir))
+
+        # store in memory if you need it later
+        all_results[(dtype, set_name)] = (condition_data, missing_all)
+
+        # report
+        print(f" → {dtype} / {set_name}:")
+        for k, df in condition_data.items():
+            print(f"    • {k}: {len(df)} rows")
+        print(f"    missing columns: {len(missing_all)}\n")
 
 # ======================================================================================================================
-# Try to revert last window
+# Check the direction of effects for PLS results
 # ======================================================================================================================
-last_window_all = pd.read_csv('./data_generated/last_60_TR_all.csv', index_col=0)
-last_window_awake = pd.read_csv('./data_generated/last_window_awake.csv', header=None)
-last_window_mild = pd.read_csv('./data_generated/last_window_mild.csv', header=None)
-last_window_deep = pd.read_csv('./data_generated/last_window_deep.csv', header=None)
-last_window_recovery = pd.read_csv('./data_generated/last_window_recovery.csv', header=None)
+# Print the average values for contrast for each condition
+contrast_dir = './data_generated/Contrasts_Full'
+
+def calculate_condition_means(contrast_dir):
+    """Calculate means for each condition within each measurement and contrast"""
+    contrasts = [d for d in os.listdir(contrast_dir) if os.path.isdir(os.path.join(contrast_dir, d))]
+
+    for contrast in contrasts:
+        contrast_path = os.path.join(contrast_dir, contrast)
+        measurements = [d for d in os.listdir(contrast_path) if os.path.isdir(os.path.join(contrast_path, d))]
+
+        print(f"\nContrast: {contrast}")
+        for measurement in measurements:
+            measurement_path = os.path.join(contrast_path, measurement)
+            print(f"\nMeasurement: {measurement}")
+
+            for file in os.listdir(measurement_path):
+                if file.endswith('.csv') and 'missing' not in file:
+                    condition = file.split('_concatenated.csv')[0]
+                    df = pd.read_csv(os.path.join(measurement_path, file), index_col=0, header=0)
+                    mean_value = df.mean().mean()
+                    print(f"Condition: {condition}, Mean: {mean_value:.4f}")
 
 
-# if rest is in the index, save it as a separate csv
-rest_files = [file for file in last_window_all.index if 'rest' in file]
-for file in rest_files:
-    df = last_window_all.loc[file]
-    df.columns = ['Hurst']
-    df.to_csv(f'./data_generated/Hurst_last_window/{file}.csv', index=False)
-
-# print the number of files in a directory
-dir = './data_generated/Hurst_mixed/'
-
-print(f'Number of files in {dir} is {len([file for file in os.listdir(dir) if file.endswith(".csv")])}')
-
-
-def read_files(directory: str):
-    counter = 0
-    for file in os.listdir(directory):
-        if file.endswith(".netts") and 'rest' in file:
-            # load data as numpy 2d array
-            array_2d = np.loadtxt(os.path.join(target_dir, file), delimiter='\t')
-
-            # Only keep 90-150 rows
-            array_2d = array_2d[:, 90:150]
-            if array_2d.shape[1] == 60:
-                counter += 1
-
-            print(array_2d.shape)
-            print(counter)
-
-
-read_files(directory=target_dir)
+# Calculate means for each contrast/measurement/condition
+calculate_condition_means(contrast_dir)
 
 
 

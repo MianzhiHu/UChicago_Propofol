@@ -3,7 +3,7 @@ import pickle
 import numpy as np
 import pandas as pd
 from matplotlib import pyplot as plt
-from Propofol.dfa import dfa
+from dfa import dfa
 
 target_dir = 'data_clean'
 

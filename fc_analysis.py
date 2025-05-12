@@ -4,11 +4,6 @@ import pickle
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import stats
-from plotting_preparation import (fc_lv_vals_movie, fc_lv_vals_rest, \
-    fc_movie_nan, fc_rest_nan, lv_vals, lv_vals_rest_last_60_TR, lv_vals_effect_of_movie, \
-    df_movie_missing, df_last_60_TR_missing, effect_of_movie_nan, fc_lv_vals_effect_of_movie, \
-    fc_effect_of_movie_nan, fc_lv_vals_rest_last_60_TR, fc_lv_vals_combined, lv_vals_combined, fc_lv_vals_everything, \
-    lv_vals_movie_everything)
 from brainsmash.mapgen.stats import spearmanr
 from sklearn.linear_model import LinearRegression
 import statsmodels.api as sm
@@ -16,7 +11,10 @@ import statsmodels.api as sm
 
 fc_dict = {}
 
-for array_2d, file in read_files_268(directory='data_clean'):
+for array_2d_raw, file in read_files_268(directory='data_clean'):
+    mask = ~(np.all((array_2d_raw == 0) | np.isnan(array_2d_raw), axis=0))
+    array_2d = array_2d_raw[:, mask]
+    print(f'array_2d raw shape: {array_2d_raw.shape}; array_2d shape: {array_2d.shape}')
     corr = np.corrcoef(array_2d)
     corr_z = np.arctanh(corr)
     np.fill_diagonal(corr_z, 2.0000)
@@ -24,27 +22,31 @@ for array_2d, file in read_files_268(directory='data_clean'):
 
     print(f'file: {file}')
 
-with open('fc_dict.pickle', 'wb') as outfile:
+with open('./data_generated/pickles/fc_dict.pickle', 'wb') as outfile:
     pickle.dump(fc_dict, outfile)
 
 print('done')
 
-# # create a new version of the dictionary for the last 60 TRs of rest
-# fc_dict_last_60_TR = {}
-#
-# for array_2d, file in read_files_268(directory='data_clean'):
-#     if "rest" in file:
-#         corr = np.corrcoef(array_2d[:, 90:150])
-#         corr_z = np.arctanh(corr)
-#         np.fill_diagonal(corr_z, 2.0000)
-#         fc_dict_last_60_TR[file] = corr_z
-#
-#         print(f'file: {file}')
-#
-# with open('fc_dict_last_60_TR.pickle', 'wb') as outfile:
-#     pickle.dump(fc_dict_last_60_TR, outfile)
-#
-# print('done')
+# create a new version of the dictionary for the last 60 TRs of rest
+fc_dict_last_60_TR = {}
+
+for array_2d_raw, file in read_files_268(directory='data_clean'):
+    if "rest" in file:
+        array_2d_raw = array_2d_raw[:, 90:150]
+        mask = ~(np.all((array_2d_raw == 0) | np.isnan(array_2d_raw), axis=0))
+        array_2d = array_2d_raw[:, mask]
+        print(f'array_2d raw shape: {array_2d_raw.shape}; array_2d shape: {array_2d.shape}')
+        corr = np.corrcoef(array_2d)
+        corr_z = np.arctanh(corr)
+        np.fill_diagonal(corr_z, 2.0000)
+        fc_dict_last_60_TR[file] = corr_z
+
+        print(f'file: {file}')
+
+with open('./data_generated/pickles/fc_dict_last_60_TR.pickle', 'wb') as outfile:
+    pickle.dump(fc_dict_last_60_TR, outfile)
+
+print('done')
 
 
 def scatter_plot():
