@@ -13,10 +13,8 @@ from pls_data_paths import (hurst_everything_list, fc_everything_list, edges_eve
 
 
 # read in the results
-path = './data_generated/PLS_outputTaskPLShurst_propofol_movie.mat'
 path_everything = './data_generated/PLS_outputTaskPLSeverything.mat'
 path_fc_everything = './data_generated/PLS_outputTaskPLSfc_everything.mat'
-# path_fc_everything = './data_generated/PLS_outputTaskPLSgeneral_fc_everything.mat'
 path_edges_everything = './data_generated/PLS_outputTaskPLSedges_everything.mat'
 
 path_effect_of_movie = './data_generated/PLS_outputTaskPLSeffect_of_movie.mat'

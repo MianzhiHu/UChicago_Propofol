@@ -211,11 +211,11 @@ class AggregatedDataGenerator:
 
 # Example Usage
 # Define the input file paths
-hurst_file_path = './data_generated/Hurst_mixed/'
-fc_file_path = './data_generated/FC_mixed/'
+hurst_file_path = './data_generated/Hurst/'
+fc_file_path = './data_generated/FC/'
 
 # Define the output file path
-output_path = Path('./data_generated/Contrasts/')
+output_path = Path('./data_generated/Contrasts_Full/')
 
 # Select from the following:
 # movie_01: Narrative-Listening Awake
@@ -268,7 +268,7 @@ for dtype, file_path in data_types.items():
 # Check the direction of effects for PLS results
 # ======================================================================================================================
 # Print the average values for contrast for each condition
-contrast_dir = './data_generated/Contrasts_Full'
+contrast_dir = './data_generated/Contrasts'
 
 def calculate_condition_means(contrast_dir):
     """Calculate means for each condition within each measurement and contrast"""
